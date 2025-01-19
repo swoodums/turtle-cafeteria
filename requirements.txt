@@ -1,0 +1,7 @@
+fastapi[standard]
+uvicorn
+pydantic
+typing
+sqlalchemy
+bcrypt
+python-multipart
