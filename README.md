@@ -155,7 +155,7 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 Sam Woodbeck - [LinkedIn](https://www.linkedin.com/in/samuel-woodbeck-25224230) -  samuel.woodbeck@gmail.com
 
-Project Link: [https://github.com/swoodums/mint-pipe](https://github.com/swoodums/turtle-cafeteria)
+Project Link: [https://github.com/swoodums/turtle-cafeteria](https://github.com/swoodums/turtle-cafeteria)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
