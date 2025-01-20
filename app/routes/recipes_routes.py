@@ -79,11 +79,12 @@ def get_recipe(
 )
 def update_recipe(
     recipe_id: int,
-    recipe_updates: recipe_schema.RecipeBase,
+    recipe_updates: recipe_schema.RecipeUpdate,
     db: Session = Depends(get_db)
 ):
     """
-    Update an existing recipe.
+    Update an existing recipe with partial updates supported.
+    Only provided fields will be updated; others will remain unchanged.
     recipe_updates contains the new data to update the recipe with.
     Raises 404 if the recipe is not found.
     """
@@ -96,7 +97,8 @@ def update_recipe(
             detail=f"Recipe with id {recipe_id} not found."
         )
     
-    for key, value in recipe_updates.model_dump().items():  # Update the recipe's attributes
+    update_data = recipe_updates.model_dump(exclude_unset=True)     # Get the update data excluding None values
+    for key, value in update_data.items():          # Update the recipe's attributes for provided fields
         setattr(db_recipe, key, value)
     db.commit()             # Commit the changes
     db.refresh(db_recipe)   # Refresh the recipe object to ensure it's up to date

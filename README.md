@@ -14,16 +14,17 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/swoodums/turtle-cafeteria">
-    <img src="images/turtle_burger.png" alt="Logo" style="max-width: 100px; width: 100%;">
-  </a>
-
+    <div style="max-width: 100px; margin: auto;">
+        <a href="https://github.com/swoodums/turtle-cafeteria">
+            <img src="images/turtle_burger.png" alt="Logo" width="100%">
+        </a>
+    </div>
+    
 <h3 align="center">Project turtle-cafeteria</h3>
-
-  <p align="center">
-    The backend learning project for the meal-planning app turtle-tray.
-    <br />
-  </p>
+    <p align="center">
+        The backend learning project for the meal-planning app turtle-tray.
+        <br />
+    </p>
 </div>
 
 
