@@ -47,7 +47,7 @@ def get_recipes(
 ):
     """
     Retrieve a list of recipes with pagination support.
-    Skip: number of recipes to skip (for pagination)
+    offset: number of recipes to offset (for pagination)
     limit: maximum number of recipes to return
     """
     recipes = db.query(recipe_model.Recipe).offset(offset).limit(limit).all()

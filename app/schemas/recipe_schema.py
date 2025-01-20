@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 class RecipeBase(BaseModel):
     title: str
@@ -11,5 +11,4 @@ class RecipeBase(BaseModel):
 class Recipe(RecipeBase):
     id: int
 
-    class Config:
-        from_attributes = True  # Allows conversion from SQLAlchemy models
+    model_config = ConfigDict(from_attributes=True)
