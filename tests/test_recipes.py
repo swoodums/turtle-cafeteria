@@ -90,6 +90,37 @@ def test_update_recipe(client, created_recipe):
     assert updated_recipe["cooking_time"] == updated_data["cooking_time"]
     assert updated_recipe["servings"] == updated_data["servings"]
 
+def test_partial_update_recipe(client, created_recipe):
+    """
+    Test updating only specific fields of a recipe.
+    Verifies that non-updated fields retain their original values.
+    """
+    # Prepare partial update data
+    partial_update = {
+        "title": "Updated Title",
+        "cooking_time": 45
+    }
+    
+    # Send partial update request
+    response = client.put(
+        f"/api/v1/recipe/{created_recipe['id']}", 
+        json=partial_update
+    )
+    
+    # Verify the response
+    assert response.status_code == status.HTTP_200_OK
+    updated_recipe = response.json()
+    
+    # Check that specified fields were updated
+    assert updated_recipe["title"] == partial_update["title"]
+    assert updated_recipe["cooking_time"] == partial_update["cooking_time"]
+    
+    # Check that other fields retained their original values
+    assert updated_recipe["description"] == created_recipe["description"]
+    assert updated_recipe["ingredients"] == created_recipe["ingredients"]
+    assert updated_recipe["steps"] == created_recipe["steps"]
+    assert updated_recipe["servings"] == created_recipe["servings"]
+
 def test_update_nonexistent_recipe(client, sample_recipe):
     """
     Test attempting to update a recipe that doesn't exist.
