@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from sqlalchemy.exc import IntegrityError
 from typing import List
 
 from app.schemas import recipe_schema
@@ -23,6 +24,7 @@ def create_step(
 ):
     """
     Creates a step for a given recipe id.
+    Ensures step number is unique for the recipe
     """
 
     # Verify the recipe exists
@@ -40,10 +42,17 @@ def create_step(
         instruction=step.instruction
     )
 
-    db.add(db_step)
-    db.commit()
-    db.refresh(db_step)
-    return db_step
+    try:
+        db.add(db_step)
+        db.commit()
+        db.refresh(db_step)
+        return db_step
+    except IntegrityError:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Step number {step.step_number} already exists for recipe {recipe_id}"
+        )
 
 @router.get(
     "/recipe/{recipe_id}",
