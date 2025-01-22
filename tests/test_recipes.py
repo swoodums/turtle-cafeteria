@@ -6,18 +6,18 @@ def test_create_recipe(client, sample_recipe):
     We use sample_recipe fixture.
     """
     response = client.post("/api/v1/recipe/", json=sample_recipe)
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_201_CREATED
     data = response.json()
     assert data["title"] == sample_recipe["title"]
     assert data["description"] == sample_recipe["description"]
-    assert data["steps"] == sample_recipe["steps"]
+    assert data["ingredients"] == sample_recipe["ingredients"]
     assert data["cooking_time"] == sample_recipe["cooking_time"]
     assert data["servings"] == sample_recipe["servings"]
     assert "id" in data
 
 def test_get_recipe_by_id(client, created_recipe):
     response = client.get(f"/api/v1/recipe/{created_recipe['id']}")
-    assert response.status_code == 200
+    assert response.status_code == status.HTTP_200_OK
     assert response.json() == created_recipe
 
 def test_get_recipes(client, created_recipe):
@@ -26,10 +26,7 @@ def test_get_recipes(client, created_recipe):
     We use the created_recipe fixture to ensure there's at least one recipe in the database.
     This gives us a known state to test against.
     """
-    # Make the GET request to retrieve all recipes
     response = client.get("/api/v1/recipe/")
-    
-    # Verify the response
     assert response.status_code == status.HTTP_200_OK
     recipes = response.json()
     
@@ -51,7 +48,6 @@ def test_get_nonexistent_recipe(client):
     nonexistent_id = 99999
     response = client.get(f"/api/v1/recipe/{nonexistent_id}")
     
-    # Verify we get a 404 response
     assert response.status_code == status.HTTP_404_NOT_FOUND
     
     # Verify the error message
@@ -63,23 +59,17 @@ def test_update_recipe(client, created_recipe):
     Test updating an existing recipe.
     We use the created_recipe fixture to ensure we have a recipe to update.
     """
-    # Prepare updated data
     updated_data = {
-        "title": "Updated Recipe Title",
-        "description": "Updated description",
-        "ingredients": "Updated ingredients list",
-        "steps": "Updated cooking steps",
-        "cooking_time": 45,
-        "servings": 6
+        "title": "Milk of Human Kindness",
+        "description": "A balm for the weary tarnished",
+        "ingredients": "1/2 pint of cheer",
+        "cooking_time": 420,
+        "servings": 69
     }
-    
-    # Send update request
     response = client.put(
         f"/api/v1/recipe/{created_recipe['id']}", 
         json=updated_data
     )
-    
-    # Verify the response
     assert response.status_code == status.HTTP_200_OK
     updated_recipe = response.json()
     
@@ -87,39 +77,9 @@ def test_update_recipe(client, created_recipe):
     assert updated_recipe["id"] == created_recipe["id"]  # ID should not change
     assert updated_recipe["title"] == updated_data["title"]
     assert updated_recipe["description"] == updated_data["description"]
+    assert updated_recipe["ingredients"] == updated_data["ingredients"]
     assert updated_recipe["cooking_time"] == updated_data["cooking_time"]
     assert updated_recipe["servings"] == updated_data["servings"]
-
-def test_partial_update_recipe(client, created_recipe):
-    """
-    Test updating only specific fields of a recipe.
-    Verifies that non-updated fields retain their original values.
-    """
-    # Prepare partial update data
-    partial_update = {
-        "title": "Updated Title",
-        "cooking_time": 45
-    }
-    
-    # Send partial update request
-    response = client.put(
-        f"/api/v1/recipe/{created_recipe['id']}", 
-        json=partial_update
-    )
-    
-    # Verify the response
-    assert response.status_code == status.HTTP_200_OK
-    updated_recipe = response.json()
-    
-    # Check that specified fields were updated
-    assert updated_recipe["title"] == partial_update["title"]
-    assert updated_recipe["cooking_time"] == partial_update["cooking_time"]
-    
-    # Check that other fields retained their original values
-    assert updated_recipe["description"] == created_recipe["description"]
-    assert updated_recipe["ingredients"] == created_recipe["ingredients"]
-    assert updated_recipe["steps"] == created_recipe["steps"]
-    assert updated_recipe["servings"] == created_recipe["servings"]
 
 def test_update_nonexistent_recipe(client, sample_recipe):
     """

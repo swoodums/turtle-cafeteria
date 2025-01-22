@@ -11,3 +11,6 @@ turtle-cafeteria-venv/
 
 #database
 *.db
+
+#coverage report
+.coverage

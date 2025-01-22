@@ -14,9 +14,9 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-    <div style="max-width: 100px; margin: auto;">
+    <div>
         <a href="https://github.com/swoodums/turtle-cafeteria">
-            <img src="images/turtle_burger.png" alt="Logo" width="100%">
+            <img src="images/turtle_burger.png" alt="Logo" width="100px">
         </a>
     </div>
     
@@ -127,8 +127,10 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [x] Develop barebones API endpoints
 - [x] Flesh out the README
 - [x] Write Tests for API app
-- [ ] Build out data structures for recipes.
-- [ ] Build out routes for recipes
+- [x] Build out data structures for recipes.
+- [x] Build out routes for recipes
+- [x] Separate Steps from Recipes
+- [ ] Separate Ingredients from Recipes
 - [ ] Orchestrate CI in GitHub Actions
 - [ ] Orchestrate CD in GitHub Actions
     - Need to have something to deploy, and set up deployment.

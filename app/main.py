@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from app.database import engine
 from app.models import recipe_model
 from app.schemas import recipe_schema
-from app.routes import recipes_routes
+from app.routes import recipes_routes, step_routes
 
 # Create the FastAPI app
 app = FastAPI(
@@ -30,3 +30,4 @@ def root():
     }
 
 app.include_router(recipes_routes.router, prefix="/api/v1")
+app.include_router(step_routes.router, prefix="/api/v1")
