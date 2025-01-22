@@ -2,11 +2,10 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from typing import Generator, Dict, Any
 
 from app.main import app
 from app.database import get_db
-from app.models.recipe_model import Recipe, Step, Base
+from app.models.recipe_model import Base
 
 # Create test database engine
 # We create this at module level since it's used by multiple fixtures
@@ -60,7 +59,9 @@ def db_session(test_db):
         yield session
     finally:
         session.close()
-        transaction.rollback()
+        # Only rollback if the transaction is still active
+        if transaction.is_active:
+            transaction.rollback()
         connection.close()
 
 @pytest.fixture

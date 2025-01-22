@@ -17,6 +17,25 @@ def test_create_step(client, created_recipe, sample_step):
     assert data["recipe_id"] == created_recipe["id"]
     assert "id" in data
 
+def test_duplicate_step_number(client, created_recipe, sample_step):
+    """
+    Test that we can't create two steps with the same step number for a recipe
+    """
+    # Create first step
+    response1 = client.post(
+        f"/api/v1/step/recipe/{created_recipe['id']}",
+        json=sample_step
+    )
+    assert response1.status_code == status.HTTP_201_CREATED
+
+    # Try to create second step with the same number
+    response2 = client.post(
+        f"/api/v1/step/recipe/{created_recipe['id']}",
+        json=sample_step
+    )
+    assert response2.status_code == status.HTTP_400_BAD_REQUEST
+    assert f"Step number {sample_step['step_number']} already exists" in response2.json()["detail"]
+
 def test_create_step_nonexistent_recipe(client, sample_step):
     """
     Test attempting to create a step for a nonexistent recipe

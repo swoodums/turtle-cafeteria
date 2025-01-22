@@ -1,5 +1,5 @@
 from typing import List
-from sqlalchemy import Text, ForeignKey
+from sqlalchemy import Text, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 class Base(DeclarativeBase):
@@ -40,3 +40,9 @@ class Step(Base):
 
     # Relationship to recipe
     recipe: Mapped["Recipe"] = relationship("Recipe", back_populates="steps")
+
+    # Ensure values for step_number are unique for a given recipe
+    # Add unique constraint for recip_id & step_id combination
+    __table_args__ = (
+        UniqueConstraint('recipe_id', 'step_number', name='unique_recipe_step'),
+    )
