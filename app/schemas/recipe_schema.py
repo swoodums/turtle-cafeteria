@@ -1,22 +1,31 @@
 from pydantic import BaseModel, ConfigDict
-from typing import Optional
+from typing import List, Optional
+
+# Step schemas
+
+class StepBase(BaseModel):
+    step_number: int
+    instruction: str
+
+class StepCreate(StepBase):
+    pass
+
+class Step(StepBase):
+    id: int
+    recipe_id: int
+    model_config=ConfigDict(from_attributes=True)
+
+# Recipe schemas
 
 class RecipeBase(BaseModel):
     title: str
     description: str
     ingredients: str
-    steps: str
     cooking_time: int
     servings: int
 
-class RecipeUpdate(RecipeBase):
-    # Override all fields as optional - allows for only updating some fields in the PUT endpoint and not having to update every field in the object.
-    title: Optional[str] = None
-    description: Optional[str] = None
-    ingredients: Optional[str] = None
-    steps: Optional[str] = None
-    cooking_time: Optional[int] = None
-    servings: Optional[int] = None
+class RecipeCreate(RecipeBase):
+    pass
 
 class Recipe(RecipeBase):
     id: int

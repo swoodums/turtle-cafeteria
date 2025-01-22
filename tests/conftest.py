@@ -6,7 +6,7 @@ from typing import Generator, Dict, Any
 
 from app.main import app
 from app.database import get_db
-from app.models.recipe_model import Recipe, Base
+from app.models.recipe_model import Recipe, Step, Base
 
 # Create test database engine
 # We create this at module level since it's used by multiple fixtures
@@ -84,15 +84,23 @@ def client(db_session):
 def sample_recipe():
     """
     Provide a sample recipe that can be used across different tests.
-    This ensures consistency in test data.
     """
     return {
-        "title": "Test Recipe",
-        "description": "A test recipe description",
-        "ingredients": "ingredient 1, ingredient 2",
-        "steps": "1. Step one 2. Step two",
-        "cooking_time": 30,
-        "servings": 4
+        "title": "Pain pudding",
+        "description": "It could be a custard, it could be a scone, it definitely hurts",
+        "ingredients": "1 cup o' hurtin', 2 tablespoons o' bruisin'",
+        "cooking_time": 69,
+        "servings": 420
+    }
+
+@pytest.fixture
+def sample_step():
+    """
+    Provide sample step data
+    """
+    return {
+        "step_number": 1,
+        "instruction": "Mix until sore"
     }
 
 @pytest.fixture
@@ -103,4 +111,15 @@ def created_recipe(client, sample_recipe):
     an existing recipe.
     """
     response = client.post("/api/v1/recipe/", json=sample_recipe)
+    return response.json()
+
+@pytest.fixture
+def created_step(client, created_recipe, sample_step):
+    """
+    Create a step for a recipe and return its data
+    """
+    response = client.post(
+        f"/api/v1/step/recipe/{created_recipe['id']}",
+        json=sample_step
+    )
     return response.json()

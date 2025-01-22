@@ -8,15 +8,20 @@ from app.database import get_db
 
 router = APIRouter(
     prefix="/recipe",
-    tags=["Recipes"])
+    tags=["Recipes"]
+)
 
 @router.post(
     "/",
     response_model=recipe_schema.Recipe,
+    status_code=status.HTTP_201_CREATED
 )
-def create_recipe(recipe: recipe_schema.RecipeBase, db: Session = Depends(get_db)):
+def create_recipe(
+    recipe: recipe_schema.RecipeCreate,
+    db: Session = Depends(get_db)
+):
     """
-    Create a new recipe in the database.
+    Create a new recipe in the database
     The recipe parameter contains the validated data from the request body.
     The db parameter is automatically provided by FastAPI using get_db dependency.
     """
@@ -25,7 +30,6 @@ def create_recipe(recipe: recipe_schema.RecipeBase, db: Session = Depends(get_db
         title=recipe.title,
         description = recipe.description,
         ingredients = recipe.ingredients,
-        steps = recipe.steps,
         cooking_time = recipe.cooking_time,
         servings = recipe.servings
     )
@@ -63,7 +67,6 @@ def get_recipe(
 ):
     """
     Retrieves a specific recipe by its ID
-    Raises 404 if the recipe is not found.
     """
     recipe = db.query(recipe_model.Recipe).filter(recipe_model.Recipe.id == recipe_id).first()
     if recipe is None:
@@ -79,14 +82,12 @@ def get_recipe(
 )
 def update_recipe(
     recipe_id: int,
-    recipe_updates: recipe_schema.RecipeUpdate,
+    recipe_updates: recipe_schema.RecipeCreate,
     db: Session = Depends(get_db)
 ):
     """
-    Update an existing recipe with partial updates supported.
-    Only provided fields will be updated; others will remain unchanged.
+    Update an existing recipe.
     recipe_updates contains the new data to update the recipe with.
-    Raises 404 if the recipe is not found.
     """
 
     # First, get the existing recipe
@@ -97,7 +98,7 @@ def update_recipe(
             detail=f"Recipe with id {recipe_id} not found."
         )
     
-    update_data = recipe_updates.model_dump(exclude_unset=True)     # Get the update data excluding None values
+    update_data = recipe_updates.model_dump()
     for key, value in update_data.items():          # Update the recipe's attributes for provided fields
         setattr(db_recipe, key, value)
     db.commit()             # Commit the changes
@@ -115,8 +116,7 @@ def deleted_recipe(
 ):
     """
     Delete a recipe by its ID.
-    Returns 204 No Conbtent on success.
-    Raises 404 if the recipe is not found. 
+    Due to cascade settings in the model, will also delete assocaited steps.
     """
 
     # Find the recipe
