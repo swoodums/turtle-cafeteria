@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine
 from app.models import recipe_model
@@ -10,6 +11,15 @@ app = FastAPI(
     title = "Turtle Cafeteria",
     summary = "The backend APIs for the Turtle Tray application",
     version = "0.0.1"
+)
+
+# Add CORSMiddleware to the application
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 # Create database tables
