@@ -22,7 +22,7 @@
     
 <h3 align="center">Project turtle-cafeteria</h3>
     <p align="center">
-        The backend learning project for the meal-planning app turtle-tray.
+        A learning project for the meal-planning app turtle-tray.
         <br />
     </p>
 </div>
@@ -48,6 +48,7 @@
     </li>
     <li><a href="#usage">Usage</a></li>
     <li><a href="#roadmap">Roadmap</a></li>
+    <li><a href="#wishlist">Wishlist</a></li>
     <li><a href="#license">License</a></li>
     <li><a href="#contact">Contact</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
@@ -61,9 +62,11 @@
 
 <!-- ![Product Name Screen Shot][product-screenshot] -->
 
-The objective of this project is to build the backend of a meal-planning application.
+The objective of this project is to build  a meal-planning application.  The goal is to learn and have fun!  I'm building out of personal interest, and to have something for my family to use.  The vision is to have an app that has a recipe book, a scheduling system to plan out meals for the week/month, and an automated shopping list to show what ingredients are needed for the time frame.
 
-This is the first part of a larger project.  See <a href="#roadmap">Roadmap</a>.  Right now, I'm deep into the API.  Much of the documentation is placeholder for the time being.
+We are building this first as a web app.  My personal requirements are to have this accessible on a laptop and on mobile devices.  In my household, that means a Windows, Linux, and Mac laptop, as well as Android and iOS mobile devices!  A web app allows this and keeps the scope reasonable.  We chose Next.js so we have the option to go towards a Progressive Web Application (PWA) later.
+
+The backend is built with FastAPI and SQLite.  The front end is built with Next.js on top of React.  The goal will be to package all of it in a docker container, but for now we're keeping the plates spinning separately.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -74,6 +77,8 @@ This is the first part of a larger project.  See <a href="#roadmap">Roadmap</a>.
 * Python 3.12.3
 * FastAPI
 * SQLite
+* React
+* Next.js
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -82,22 +87,19 @@ This is the first part of a larger project.  See <a href="#roadmap">Roadmap</a>.
 <!-- GETTING STARTED -->
 ## Getting Started
 
-Create a virtual environment.
-```bash
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# or
-venv\Scripts\activate   # Windows
-```
-To get a local copy up and running follow these steps.
+Lorem ipsum.  We're in the pre-alpha here, so everything is moving and changing.
 
 ### Prerequisites
 
+#### Back End
 Use `pip` to install the packages from the `requirements.txt` file.
+
+#### Front End
+Lorem ipsum
 
 ### Installation
 
-All lorem ipsum since we're still in development
+Lorem ipsum
 
 1. Clone the repo
    ```bash
@@ -113,7 +115,7 @@ All lorem ipsum since we're still in development
 <!-- USAGE EXAMPLES -->
 ## Usage
 
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
+Lorem ipsum
 
 _For more examples, please refer to the [Documentation](https://example.com)_
 
@@ -138,11 +140,23 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [ ] Build out routes for scheduling
 - [ ] Start to integrate with a frontend
 
-
 See the [open issues](https://github.com/swoodums/turtle-cafeteria/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<!-- WISHLIST -->
+## Wishlist
+
+What good is learning without dreaming about what it could do?  Here are some dreams that are out of scope for now, but could be worked on later.
+* Do it again, but with React Native to allow native functionality on Android and iOS devices.
+* Cost analysis based on ingredients
+* Nutrition / Macros analysis based on ingredients
+* Scraping websites to automatically generate recipes
+* Inventory system to compare against what is already on hand
+  * Ability to see expiration dates - trending towards a Home Ec ERP
+  * If we're dreaming really big, some computer vision to scan what's in the fridge and pantry.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- LICENSE -->
 ## License

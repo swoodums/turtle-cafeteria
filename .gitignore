@@ -2,15 +2,10 @@
 entity_relationship.drawio
 .$entity_relationship.drawio.bkp
 
-# pycaches
+# Backend
+backend/*.db
+backend/.coverage
 **/__pycache__/
 *.pyc
-
-#virtual environment
-turtle-cafeteria-venv/
-
-#database
-*.db
-
-#coverage report
-.coverage
+*.pytest_cache
+backend/venv/

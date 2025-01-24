@@ -5,3 +5,5 @@ typing
 sqlalchemy
 bcrypt
 python-multipart
+pytest
+pytest-cov
