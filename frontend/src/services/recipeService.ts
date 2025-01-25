@@ -12,5 +12,10 @@ export const recipeService = {
     async getRecipeById(id: number) {
         const { data } = await api.get<Recipe>(`/recipe/${id}`);
         return data;
+    },
+
+    async createRecipe(recipe: Omit<Recipe, 'id'>) {
+        const { data } = await api.post<Recipe>('/recipe/', recipe);
+        return data;
     }
 };
