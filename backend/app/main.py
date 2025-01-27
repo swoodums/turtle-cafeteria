@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine
 from app.models import recipe_model
-from app.routes import recipes_routes, direction_routes
+from app.routes import recipes_routes, direction_routes, recipe_ingredients_routes
 
 # Create the FastAPI app
 app = FastAPI(
@@ -43,3 +43,4 @@ def root():
 
 app.include_router(recipes_routes.router, prefix="/api/v1")
 app.include_router(direction_routes.router, prefix="/api/v1")
+app.include_router(recipe_ingredients_routes.router, prefix="/api/v1")

@@ -10,7 +10,6 @@ def test_create_recipe(client, sample_recipe):
     data = response.json()
     assert data["title"] == sample_recipe["title"]
     assert data["description"] == sample_recipe["description"]
-    assert data["ingredients"] == sample_recipe["ingredients"]
     assert data["cooking_time"] == sample_recipe["cooking_time"]
     assert data["servings"] == sample_recipe["servings"]
     assert "id" in data
@@ -62,7 +61,6 @@ def test_update_recipe(client, created_recipe):
     updated_data = {
         "title": "Milk of Human Kindness",
         "description": "A balm for the weary tarnished",
-        "ingredients": "1/2 pint of cheer",
         "cooking_time": 420,
         "servings": 69
     }
@@ -77,7 +75,6 @@ def test_update_recipe(client, created_recipe):
     assert updated_recipe["id"] == created_recipe["id"]  # ID should not change
     assert updated_recipe["title"] == updated_data["title"]
     assert updated_recipe["description"] == updated_data["description"]
-    assert updated_recipe["ingredients"] == updated_data["ingredients"]
     assert updated_recipe["cooking_time"] == updated_data["cooking_time"]
     assert updated_recipe["servings"] == updated_data["servings"]
 

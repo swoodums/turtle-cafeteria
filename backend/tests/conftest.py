@@ -89,7 +89,6 @@ def sample_recipe():
     return {
         "title": "Pain pudding",
         "description": "It could be a custard, it could be a scone, it definitely hurts",
-        "ingredients": "1 cup o' hurtin', 2 tablespoons o' bruisin'",
         "cooking_time": 69,
         "servings": 420
     }
@@ -102,6 +101,17 @@ def sample_direction():
     return {
         "direction_number": 1,
         "instruction": "Mix until sore"
+    }
+
+@pytest.fixture
+def sample_recipe_ingredient():
+    """
+    Provide sample recipe ingredient data
+    """
+    return{
+        "name": "Salt",
+        "quantity": 2,
+        "unit": "tablespoon"
     }
 
 @pytest.fixture
@@ -122,5 +132,16 @@ def created_direction(client, created_recipe, sample_direction):
     response = client.post(
         f"/api/v1/direction/recipe/{created_recipe['id']}",
         json=sample_direction
+    )
+    return response.json()
+
+@pytest.fixture
+def created_recipe_ingredient(client, created_recipe, sample_recipe_ingredient):
+    """
+    Create a recipe ingredient for a recipe and return its data
+    """
+    response = client.post(
+        f"/api/v1/recipe_ingredients/recipe/{created_recipe['id']}",
+        json=sample_recipe_ingredient
     )
     return response.json()
