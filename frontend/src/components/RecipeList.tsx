@@ -4,7 +4,7 @@
 
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { recipeService } from '@/services/recipeService';
+import recipeService from '@/services/recipeService';
 import { Box, Button, CircularProgress, Container, Grid2, Typography } from '@mui/material';
 import RecipeCard from './RecipeCard';
 import CreateRecipeModal from './CreateRecipeModal';
@@ -16,10 +16,6 @@ export default function RecipeList() {
         queryKey: ['recipes'],
         queryFn: recipeService.getAllRecipes,
     });
-
-    console.log('Recipes:', recipes);  // Add this
-    console.log('Loading:', isLoading);  // Add this
-    console.log('Error:', error);  // Add this
 
     if (isLoading) {
         return (
@@ -69,6 +65,7 @@ export default function RecipeList() {
                     <RecipeCard
                         recipe={recipe}
                         onClick={() => {/* We'll add modal logic here later */}}
+                        onEdit={(recipe) => {/* We'll add edit logic here later */}}
                     />
                 </Grid2>
             ))}

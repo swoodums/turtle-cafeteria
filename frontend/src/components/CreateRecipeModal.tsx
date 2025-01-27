@@ -6,11 +6,21 @@ import {
     DialogContent,
     DialogActions,
     TextField,
-    Stack
-} from '@mui/material';
-import { Recipe } from '@/types/recipe';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { recipeService } from '@/services/recipeService';
+    Stack,
+    IconButton,
+    Box,
+    Typography} from '@mui/material';
+import {
+    Add as AddIcon,
+    Delete as DeleteIcon} from '@mui/icons-material'
+import {
+    Recipe,
+    Step,
+    RecipeFormData } from '@/types/recipe';
+import {
+    useMutation,
+    useQueryClient } from '@tanstack/react-query';
+import recipeService from '@/services/recipeService';
 
 interface CreateRecipeModalProps {
     open: boolean;
@@ -21,12 +31,60 @@ const initialFormState = {
     title: '',
     description: '',
     ingredients: '',
-    cooking_time: '',
-    servings: ''
+    cooking_time: 0,
+    servings: 0,
+    steps: [{ step_number: 1, instruction: ''}]
 };
 
+// Steps Section Component
+const StepsSection = ({
+    steps,
+    onStepChange,
+    onAddStep,
+    onRemoveStep
+}: {
+    steps: Step[];
+    onStepChange:  (index: number, value: string) => void;
+    onAddStep: () => void;
+    onRemoveStep: (index: number) => void;
+}) => (
+    <Box sx={{ mt: 2 }}>
+        <Typography variant="subtitle1" gutterBottom>
+            Recipe Steps
+        </Typography>
+        {steps.map((step, index) => (
+            <Box key={index} sx={{ display: 'flex', gap: 1, mb: 2}}>
+                <TextField
+                    fullWidth
+                    multiline
+                    rows={2}
+                    label={`Step ${step.step_number}`}
+                    value={step.instruction}
+                    onChange={(e) => onStepChange(index, e.target.value)}
+                    required
+                />
+                <IconButton
+                    onClick={() => onRemoveStep(index)}
+                    disabled={steps.length === 1}
+                    sx={{ mt: 1}}
+                >
+                    <DeleteIcon />
+                </IconButton>
+            </Box>
+        ))}
+        <Button
+            startIcon={<AddIcon />}
+            onClick={onAddStep}
+            variant="outlined"
+            size="small"
+            >
+                Add Step
+        </Button>
+    </Box>
+);
+
 export default function CreateRecipeModal({ open, onClose }: CreateRecipeModalProps) {
-    const [formData, setFormData] = useState(initialFormState);
+    const [formData, setFormData] = useState<RecipeFormData>(initialFormState);
     const queryClient = useQueryClient();
 
     const createRecipeMutation = useMutation({
@@ -49,14 +107,45 @@ export default function CreateRecipeModal({ open, onClose }: CreateRecipeModalPr
         e.preventDefault();
         createRecipeMutation.mutate({
             ...formData,
-            cooking_time: parseInt(formData.cooking_time),
-            servings: parseInt(formData.servings)
+            cooking_time: formData.cooking_time,
+            servings: formData.servings
         });
     };
 
     const handleClose = () => {
         setFormData(initialFormState);
         onClose();
+    };
+
+
+
+    const handleStepChange = (index: number, instruction: string) => {
+        // const newSteps = prev.steps.map()
+        setFormData(prev => ({
+            ...prev,
+            steps: prev.steps.map((step, i) =>
+                i === index ? { ...step, instruction } : step
+            )
+        }));
+    };
+
+    const handleAddStep = () => {
+        setFormData(prev => ({
+            ...prev,
+            steps: [
+                ...prev.steps,
+                { step_number: prev.steps.length + 1, instruction: '' }
+            ]
+        }));
+    };
+
+    const handleRemoveStep = (index: number) => {
+        setFormData(prev => ({
+            ...prev,
+            steps: prev.steps
+                .filter((_, i) => i !== index)
+                .map((step, i) => ({ ...step, step_number: i + 1 }))
+        }));
     };
 
     return (
@@ -110,6 +199,14 @@ export default function CreateRecipeModal({ open, onClose }: CreateRecipeModalPr
                             type="number"
                             fullWidth
                             required
+                        />
+
+                        {/* Steps Section */}
+                        <StepsSection
+                            steps={formData.steps}
+                            onStepChange={handleStepChange}
+                            onAddStep={handleAddStep}
+                            onRemoveStep={handleRemoveStep}
                         />
                     </Stack>
                 </DialogContent>
