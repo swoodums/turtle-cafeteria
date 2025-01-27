@@ -89,7 +89,6 @@ def sample_recipe():
     return {
         "title": "Pain pudding",
         "description": "It could be a custard, it could be a scone, it definitely hurts",
-        "ingredients": "1 cup o' hurtin', 2 tablespoons o' bruisin'",
         "cooking_time": 69,
         "servings": 420
     }

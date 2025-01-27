@@ -34,7 +34,6 @@ class RecipeIngredient(RecipeIngredientBase):
 class RecipeBase(BaseModel):
     title: str
     description: str
-    ingredients: str
     cooking_time: int
     servings: int
 

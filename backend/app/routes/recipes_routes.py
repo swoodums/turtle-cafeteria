@@ -29,7 +29,6 @@ def create_recipe(
     db_recipe = recipe_model.Recipe(
         title=recipe.title,
         description = recipe.description,
-        ingredients = recipe.ingredients,
         cooking_time = recipe.cooking_time,
         servings = recipe.servings
     )
