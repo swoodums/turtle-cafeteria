@@ -1,14 +1,14 @@
 /* frontend/src/services/recipeService.ts */
 
 import { api } from './api';
-import { Recipe } from '@/types/recipe';
+import { Recipe, Direction } from '@/types/recipe';
 
 export default {
     getAllRecipes,
     getRecipeById,
     deleteRecipeById,
     createRecipe,
-    createStep
+    createDirection
 }
 
 
@@ -31,7 +31,7 @@ async function createRecipe(recipe: Omit<Recipe, 'id'>) {
     return data;
 }
 
-async function createStep(recipeId: number, step: { step_number: number; instruction: string}) {
-    const { data } = await api.post<Recipe>(`/step/recipe/${recipeId}`, step);
+async function createDirection(recipeId: number, direction: Omit<Direction, 'id' | 'recipe_id'>) {
+    const { data } = await api.post<Direction>(`/direction/recipe/${recipeId}`, direction);
     return data;
 }

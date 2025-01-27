@@ -95,12 +95,12 @@ def sample_recipe():
     }
 
 @pytest.fixture
-def sample_step():
+def sample_direction():
     """
-    Provide sample step data
+    Provide sample direction data
     """
     return {
-        "step_number": 1,
+        "direction_number": 1,
         "instruction": "Mix until sore"
     }
 
@@ -115,12 +115,12 @@ def created_recipe(client, sample_recipe):
     return response.json()
 
 @pytest.fixture
-def created_step(client, created_recipe, sample_step):
+def created_direction(client, created_recipe, sample_direction):
     """
-    Create a step for a recipe and return its data
+    Create a direction for a recipe and return its data
     """
     response = client.post(
-        f"/api/v1/step/recipe/{created_recipe['id']}",
-        json=sample_step
+        f"/api/v1/direction/recipe/{created_recipe['id']}",
+        json=sample_direction
     )
     return response.json()
