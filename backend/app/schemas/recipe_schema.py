@@ -1,16 +1,15 @@
 from pydantic import BaseModel, ConfigDict
-from typing import List, Optional
 
-# Step schemas
+# Direction schemas
 
-class StepBase(BaseModel):
-    step_number: int
+class DirectionBase(BaseModel):
+    direction_number: int
     instruction: str
 
-class StepCreate(StepBase):
+class DirectionCreate(DirectionBase):
     pass
 
-class Step(StepBase):
+class Direction(DirectionBase):
     id: int
     recipe_id: int
     model_config=ConfigDict(from_attributes=True)

@@ -7,12 +7,20 @@ export interface Recipe {
   ingredients: string;
   cooking_time: number;
   servings: number;
+  directions?: Direction[];
 };
 
-export interface Step {
-  step_number: number;
+export interface Direction {
+  id: number,
+  recipe_id: number,
+  direction_number: number;
   instruction: string;
 };
+
+export interface DirectionInput {
+  direction_number: number;
+  instruction: string;
+}
 
 export interface RecipeFormData {
   title: string;
@@ -20,5 +28,5 @@ export interface RecipeFormData {
   ingredients: string;
   cooking_time: number;
   servings: number;
-  steps: Step[];
-}
+  directions: DirectionInput[];
+};

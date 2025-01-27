@@ -15,7 +15,8 @@ import {
     Delete as DeleteIcon} from '@mui/icons-material'
 import {
     Recipe,
-    Step,
+    Direction,
+    DirectionInput,
     RecipeFormData } from '@/types/recipe';
 import {
     useMutation,
@@ -33,39 +34,39 @@ const initialFormState = {
     ingredients: '',
     cooking_time: 0,
     servings: 0,
-    steps: [{ step_number: 1, instruction: ''}]
+    directions: [{ direction_number: 1, instruction: ''}]
 };
 
-// Steps Section Component
-const StepsSection = ({
-    steps,
-    onStepChange,
-    onAddStep,
-    onRemoveStep
+// Directions Section Component
+const DirectionsSection = ({
+    directions,
+    onDirectionChange,
+    onAddDirection,
+    onRemoveDirection
 }: {
-    steps: Step[];
-    onStepChange:  (index: number, value: string) => void;
-    onAddStep: () => void;
-    onRemoveStep: (index: number) => void;
+    directions: DirectionInput[];
+    onDirectionChange:  (index: number, value: string) => void;
+    onAddDirection: () => void;
+    onRemoveDirection: (index: number) => void;
 }) => (
     <Box sx={{ mt: 2 }}>
         <Typography variant="subtitle1" gutterBottom>
-            Recipe Steps
+            Recipe Directions
         </Typography>
-        {steps.map((step, index) => (
+        {directions.map((direction, index) => (
             <Box key={index} sx={{ display: 'flex', gap: 1, mb: 2}}>
                 <TextField
                     fullWidth
                     multiline
                     rows={2}
-                    label={`Step ${step.step_number}`}
-                    value={step.instruction}
-                    onChange={(e) => onStepChange(index, e.target.value)}
+                    label={`Direction ${direction.direction_number}`}
+                    value={direction.instruction}
+                    onChange={(e) => onDirectionChange(index, e.target.value)}
                     required
                 />
                 <IconButton
-                    onClick={() => onRemoveStep(index)}
-                    disabled={steps.length === 1}
+                    onClick={() => onRemoveDirection(index)}
+                    disabled={directions.length === 1}
                     sx={{ mt: 1}}
                 >
                     <DeleteIcon />
@@ -74,11 +75,11 @@ const StepsSection = ({
         ))}
         <Button
             startIcon={<AddIcon />}
-            onClick={onAddStep}
+            onClick={onAddDirection}
             variant="outlined"
             size="small"
             >
-                Add Step
+                Add Direction
         </Button>
     </Box>
 );
@@ -88,7 +89,7 @@ export default function CreateRecipeModal({ open, onClose }: CreateRecipeModalPr
     const queryClient = useQueryClient();
 
     const createRecipeMutation = useMutation({
-        mutationFn: (newRecipe: Omit<Recipe, 'id'>) => recipeService.createRecipe(newRecipe),
+        mutationFn: (newRecipe: RecipeFormData) => recipeService.createRecipe(newRecipe),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['recipes'] });
             handleClose();
@@ -119,32 +120,32 @@ export default function CreateRecipeModal({ open, onClose }: CreateRecipeModalPr
 
 
 
-    const handleStepChange = (index: number, instruction: string) => {
-        // const newSteps = prev.steps.map()
+    const handleDirectionChange = (index: number, instruction: string) => {
+        // const newDirections = prev.directions.map()
         setFormData(prev => ({
             ...prev,
-            steps: prev.steps.map((step, i) =>
-                i === index ? { ...step, instruction } : step
+            directions: prev.directions.map((direction, i) =>
+                i === index ? { ...direction, instruction } : direction
             )
         }));
     };
 
-    const handleAddStep = () => {
+    const handleAddDirection = () => {
         setFormData(prev => ({
             ...prev,
-            steps: [
-                ...prev.steps,
-                { step_number: prev.steps.length + 1, instruction: '' }
+            directions: [
+                ...prev.directions,
+                { direction_number: prev.directions.length + 1, instruction: '' }
             ]
         }));
     };
 
-    const handleRemoveStep = (index: number) => {
+    const handleRemoveDirection = (index: number) => {
         setFormData(prev => ({
             ...prev,
-            steps: prev.steps
+            directions: prev.directions
                 .filter((_, i) => i !== index)
-                .map((step, i) => ({ ...step, step_number: i + 1 }))
+                .map((direction, i) => ({ ...direction, direction_number: i + 1 }))
         }));
     };
 
@@ -201,12 +202,12 @@ export default function CreateRecipeModal({ open, onClose }: CreateRecipeModalPr
                             required
                         />
 
-                        {/* Steps Section */}
-                        <StepsSection
-                            steps={formData.steps}
-                            onStepChange={handleStepChange}
-                            onAddStep={handleAddStep}
-                            onRemoveStep={handleRemoveStep}
+                        {/* Directions Section */}
+                        <DirectionsSection
+                            directions={formData.directions}
+                            onDirectionChange={handleDirectionChange}
+                            onAddDirection={handleAddDirection}
+                            onRemoveDirection={handleRemoveDirection}
                         />
                     </Stack>
                 </DialogContent>

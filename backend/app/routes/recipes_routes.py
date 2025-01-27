@@ -116,7 +116,7 @@ def deleted_recipe(
 ):
     """
     Delete a recipe by its ID.
-    Due to cascade settings in the model, will also delete assocaited steps.
+    Due to cascade settings in the model, will also delete assocaited directions.
     """
 
     # Find the recipe
