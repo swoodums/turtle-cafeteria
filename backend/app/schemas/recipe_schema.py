@@ -14,6 +14,21 @@ class Direction(DirectionBase):
     recipe_id: int
     model_config=ConfigDict(from_attributes=True)
 
+# Ingredient schemas
+
+class RecipeIngredientBase(BaseModel):
+    name: str
+    quantity: float
+    unit: str
+
+class RecipeIngredientCreate(RecipeIngredientBase):
+    pass
+
+class RecipeIngredient(RecipeIngredientBase):
+    id: int
+    recipe_id: int
+    model_config=ConfigDict(from_attributes=True)
+
 # Recipe schemas
 
 class RecipeBase(BaseModel):
@@ -28,5 +43,4 @@ class RecipeCreate(RecipeBase):
 
 class Recipe(RecipeBase):
     id: int
-
     model_config = ConfigDict(from_attributes=True)

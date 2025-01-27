@@ -105,6 +105,17 @@ def sample_direction():
     }
 
 @pytest.fixture
+def sample_recipe_ingredient():
+    """
+    Provide sample recipe ingredient data
+    """
+    return{
+        "name": "Salt",
+        "quantity": 2,
+        "unit": "tablespoon"
+    }
+
+@pytest.fixture
 def created_recipe(client, sample_recipe):
     """
     Create a recipe in the database and return its data.
@@ -122,5 +133,16 @@ def created_direction(client, created_recipe, sample_direction):
     response = client.post(
         f"/api/v1/direction/recipe/{created_recipe['id']}",
         json=sample_direction
+    )
+    return response.json()
+
+@pytest.fixture
+def created_recipe_ingredient(client, created_recipe, sample_recipe_ingredient):
+    """
+    Create a recipe ingredient for a recipe and return its data
+    """
+    response = client.post(
+        f"/api/v1/recipe_ingredients/recipe/{created_recipe['id']}",
+        json=sample_recipe_ingredient
     )
     return response.json()
