@@ -82,7 +82,50 @@ The backend is built with FastAPI and SQLite.  The front end is built with Next.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
+<!-- ROADMAP -->
+## Roadmap
 
+### Back End
+- [x] Develop barebones API endpoints
+- [x] Flesh out the README
+- [x] Write Tests for API app
+- [x] Build out data structures for recipes.
+- [x] Build out routes for recipes
+- [x] Separate Steps from Recipes
+- [x] Add middleware to allow frontend communication
+- [x] Build out data structures for Recipe Ingredients
+- [x] Build out routes for Recipe Ingredients
+- [ ] Build out data structures for scheduling
+- [ ] Build out routes for scheduling
+- [ ] Build out data structures for Ingredients
+- [ ] Build out routes for Ingredients
+- [ ] Integrate Ingredients into backend flow
+- [ ] Flesh out idea for image storage
+
+### Front End
+- [x] Build out barebones frontend
+- [x] Verify end-to-end function with backend
+- [ ] Move create/edit recipe functionality to pages instead of modals
+  - [x] Recipe form
+  - [x] Create recipe page
+  - [ ] Edit recipe page
+- [ ] Add navigation
+- [ ] Create page for creating/editing ingredients
+- [ ] Add testing
+- [ ] Create page for scheduling
+- [ ] Flesh out idea for images
+
+
+### Project
+- [ ] Put it all in a container
+- [ ] Orchestrate CI in GitHub Actions
+- [ ] Orchestrate CD in GitHub Actions
+    - Need to have something to deploy, and set up deployment.
+- [ ] Figure out how to actually host the app vs. running locally
+
+See the [open issues](https://github.com/swoodums/turtle-cafeteria/issues) for a full list of proposed features (and known issues).
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -118,49 +161,6 @@ Lorem ipsum
 Lorem ipsum
 
 _For more examples, please refer to the [Documentation](https://example.com)_
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- ROADMAP -->
-## Roadmap
-
-### Back End
-- [x] Develop barebones API endpoints
-- [x] Flesh out the README
-- [x] Write Tests for API app
-- [x] Build out data structures for recipes.
-- [x] Build out routes for recipes
-- [x] Separate Steps from Recipes
-- [x] Add middleware to allow frontend communication
-- [x] Build out data structures for Recipe Ingredients
-- [x] Build out routes for Recipe Ingredients
-- [ ] Build out data structures for scheduling
-- [ ] Build out routes for scheduling
-- [ ] Build out data structures for Ingredients
-- [ ] Build out routes for Ingredients
-- [ ] Integrate Ingredients into backend flow
-- [ ] Flesh out idea for image storage
-
-### Front End
-- [x] Build out barebones frontend
-- [x] Verify end-to-end function with backend
-- [ ] Move create/edit recipe functionality to pages instead of modals
-- [ ] Create page for creating/editing ingredients
-- [ ] Add testing
-- [ ] Create page for scheduling
-- [ ] Flesh out idea for images
-
-
-### Project
-- [ ] Put it all in a container
-- [ ] Orchestrate CI in GitHub Actions
-- [ ] Orchestrate CD in GitHub Actions
-    - Need to have something to deploy, and set up deployment.
-- [ ] Figure out how to actually host the app vs. running locally
-
-See the [open issues](https://github.com/swoodums/turtle-cafeteria/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
