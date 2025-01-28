@@ -1,14 +1,15 @@
 /* frontend/src/services/recipeService.ts */
 
+import { Recipe, Direction, RecipeIngredient, RecipeIngredientCreate, DirectionCreate, RecipeCreate } from '@/types/recipes';
 import { api } from './api';
-import { Recipe, Direction } from '@/types/recipe';
 
 export default {
     getAllRecipes,
     getRecipeById,
     deleteRecipeById,
     createRecipe,
-    createDirection
+    createDirection,
+    createRecipeIngregient
 }
 
 
@@ -26,12 +27,17 @@ async function deleteRecipeById(id: number) {
     await api.delete<Recipe>(`/recipe/${id}`);
 }
 
-async function createRecipe(recipe: Omit<Recipe, 'id'>) {
+async function createRecipe(recipe: RecipeCreate) {
     const { data } = await api.post<Recipe>('/recipe/', recipe);
     return data;
 }
 
-async function createDirection(recipeId: number, direction: Omit<Direction, 'id' | 'recipe_id'>) {
+async function createDirection(recipeId: number, direction: DirectionCreate) {
     const { data } = await api.post<Direction>(`/direction/recipe/${recipeId}`, direction);
+    return data;
+}
+
+async function createRecipeIngregient(recipeId: number, recipeIngredient: RecipeIngredientCreate) {
+    const { data } = await api.post<RecipeIngredient>(`/recipe_ingredients/recipe/${recipeId}`, recipeIngredient);
     return data;
 }

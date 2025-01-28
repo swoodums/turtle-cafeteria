@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import recipeService from '@/services/recipeService';
 import { Box, Button, CircularProgress, Container, Grid2, Typography } from '@mui/material';
 import RecipeCard from './RecipeCard';
-import CreateRecipeModal from './CreateRecipeModal';
+import CreateRecipeModal from '../../CreateRecipeModal';
 import { Add as AddIcon } from '@mui/icons-material'
 
 export default function RecipeList() {
@@ -40,20 +40,8 @@ export default function RecipeList() {
             mb: 6 
         }}>
             <Typography variant="h3" component="h1">
-                Recipes
+                Recipes ✨
             </Typography>
-            <Button
-                variant="contained"
-                startIcon={<AddIcon />}
-                onClick={() => setIsModalOpen(true)}
-                sx={{ 
-                    position: 'absolute',  // Position it absolutely
-                    right: 0,              // Align to the right
-                    top: 0                 // Align to the top
-                }}
-            >
-                New Recipe
-            </Button>
         </Box>
 
         <Grid2 container spacing={3}>

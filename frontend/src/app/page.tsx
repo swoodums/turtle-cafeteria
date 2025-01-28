@@ -1,7 +1,7 @@
 /* frontend/src/app/page.tsx */
 
-import RecipeList from '@/components/RecipeList';
+import { redirect } from 'next/navigation'
 
-export default function RecipesPage() {
-  return <RecipeList />;
+export default function Home() {
+  redirect('/recipes');
 }
