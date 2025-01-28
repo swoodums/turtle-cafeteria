@@ -1,7 +1,18 @@
 /* frontend/src/app/page.tsx */
 
-import { redirect } from 'next/navigation'
+import { useEffect } from 'react';
+import { useRouter, redirect } from 'next/navigation';
 
 export default function Home() {
-  redirect('/recipes');
+  const router = useRouter();
+
+  useEffect(() => {
+    router.push('/recipes');
+  }, [router]);
+
+  return null;
 }
+
+// export default function Home() {
+//   redirect('/recipes');
+// }

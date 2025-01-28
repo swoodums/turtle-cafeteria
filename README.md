@@ -109,7 +109,7 @@ The backend is built with FastAPI and SQLite.  The front end is built with Next.
   - [x] Recipe form
   - [x] Create recipe page
   - [ ] Edit recipe page
-- [ ] Add navigation
+- [x] Add navigation
 - [ ] Create page for creating/editing ingredients
 - [ ] Add testing
 - [ ] Create page for scheduling

@@ -1,8 +1,8 @@
-/* frontend/src/components/RecipeCard.tsx */
+/* frontend/src/components/recipes/RecipeCard.tsx */
 
 'use client'
 
-import { Recipe } from '@/types/recipe'
+import { Recipe } from '@/types/recipes';
 import {
     Box,
     Card,

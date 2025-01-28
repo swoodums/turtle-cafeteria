@@ -1,4 +1,4 @@
-import RecipeForm from '@/components/recipes/RecipeForm/RecipeForm';
+import RecipeForm from '@/components/recipes/RecipeForm';
 import { Container, Typography } from '@mui/material';
 
 export default function NewRecipePage() {
