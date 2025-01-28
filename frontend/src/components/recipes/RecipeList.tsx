@@ -1,4 +1,4 @@
-/* frontend/src/components/RecipeList.tsx */
+/* frontend/src/components/recipes/RecipeList.tsx */
 
 'use client';
 
@@ -7,7 +7,6 @@ import { useQuery } from '@tanstack/react-query';
 import recipeService from '@/services/recipeService';
 import { Box, Button, CircularProgress, Container, Grid2, Typography } from '@mui/material';
 import RecipeCard from './RecipeCard';
-import CreateRecipeModal from '../../CreateRecipeModal';
 import { Add as AddIcon } from '@mui/icons-material'
 
 export default function RecipeList() {
@@ -39,7 +38,7 @@ export default function RecipeList() {
             position: 'relative',  // This allows absolute positioning of children
             mb: 6 
         }}>
-            <Typography variant="h3" component="h1">
+            <Typography variant="h2" component="h1" align='center'>
                 Recipes ✨
             </Typography>
         </Box>
@@ -58,11 +57,6 @@ export default function RecipeList() {
                 </Grid2>
             ))}
         </Grid2>
-
-        <CreateRecipeModal
-            open={isModalOpen}
-            onClose={() => setIsModalOpen(false)}
-        />
     </Container>
     );
 }
