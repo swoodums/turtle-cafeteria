@@ -134,10 +134,13 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [x] Build out routes for recipes
 - [x] Separate Steps from Recipes
 - [x] Add middleware to allow frontend communication
-- [ ] Build out data structures for Ingredients, RecipeIngredients
-- [ ] Build out routes for Ingredients, Recipe Ingredients
+- [x] Build out data structures for Recipe Ingredients
+- [x] Build out routes for Recipe Ingredients
 - [ ] Build out data structures for scheduling
 - [ ] Build out routes for scheduling
+- [ ] Build out data structures for Ingredients
+- [ ] Build out routes for Ingredients
+- [ ] Integrate Ingredients into backend flow
 - [ ] Flesh out idea for image storage
 
 ### Front End
