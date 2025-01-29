@@ -1,11 +1,13 @@
-export default function RecipeDetailpage({
-    params,
-} : {
-    params: { id:string };
-}) {
-    return (
-        <div className="container mx-auto py-8">
-            <h1 className="text-3xl font-bold mb-6">Recipe Details</h1>
-        </div>
-    );
+import RecipeView from "@/components/recipes/RecipeView";
+
+interface RecipePageProps {
+    params: Promise<{
+        id: string;
+    }>;
+}
+
+export default async function RecipePage({ params }: RecipePageProps) {
+    const resolvedParams = await params;
+    const recipeId = parseInt(resolvedParams.id);
+    return <RecipeView recipeId={recipeId} />;
 }

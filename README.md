@@ -108,6 +108,7 @@ The backend is built with FastAPI and SQLite.  The front end is built with Next.
 - [ ] Move create/edit recipe functionality to pages instead of modals
   - [x] Recipe form
   - [x] Create recipe page
+  - [x] View recipe page
   - [ ] Edit recipe page
 - [x] Add navigation
 - [ ] Create page for creating/editing ingredients
@@ -127,43 +128,6 @@ See the [open issues](https://github.com/swoodums/turtle-cafeteria/issues) for a
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- GETTING STARTED -->
-## Getting Started
-
-Lorem ipsum.  We're in the pre-alpha here, so everything is moving and changing.
-
-### Prerequisites
-
-#### Back End
-Use `pip` to install the packages from the `requirements.txt` file.
-
-#### Front End
-Lorem ipsum
-
-### Installation
-
-Lorem ipsum
-
-1. Clone the repo
-   ```bash
-   git clone https://github.com/swoodums/turtle-cafeteria.git
-   ```
-2. Install required packages
-3. Run uvicorn server
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-Lorem ipsum
-
-_For more examples, please refer to the [Documentation](https://example.com)_
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 <!-- WISHLIST -->
 ## Wishlist
 
@@ -175,6 +139,70 @@ What good is learning without dreaming about what it could do?  Here are some dr
 * Inventory system to compare against what is already on hand
   * Ability to see expiration dates - trending towards a Home Ec ERP
   * If we're dreaming really big, some computer vision to scan what's in the fridge and pantry.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- GETTING STARTED -->
+## Getting Started
+
+Lorem ipsum.  We're in the pre-alpha here, so everything is moving and changing.
+
+### Prerequisites
+
+Python 3 and npm are installed on the local machine
+
+### Installation
+
+Lorem ipsum
+
+1. Clone the repo
+   ```bash
+   $ git clone https://github.com/swoodums/turtle-cafeteria.git
+   ```
+2. Install required packages
+   1. Back end:
+      - Create a virtual environment and activate it:
+         ```bash
+         $ python -m venv venv
+         $ source venv/bin/activate
+         ```
+      - Install the required packages:
+         ```bash
+         $ pip install requirements.txt
+         ```
+   2. Front end:
+      - Navigate to the frontend directory and install dependencies:
+         ```bash
+         $ cd frontend
+         $ npm install
+         ```
+3. Run uvicorn server or fast api dev from the backend directory:
+    ```bash
+    $ cd backend && fastapi dev
+    ```
+4. Run the npm dev build from the frontend directory:
+    ```bash
+    $ cd frontend && npm run dev
+    ```
+5. To access the app, navigate to http://localhost:3000/recipes
+6. To view the back end API documentation, go to http://127.0.0.1:8000/docs#/ or http://127.0.0.1:8000/redoc
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+
+<!-- USAGE EXAMPLES -->
+## Usage
+
+Use the navigation bar on the left to drive!
+
+<img src="images/recipe-page.png" alt="Main Page">
+
+Click on a recipe card to view the whole recipe!
+
+<img src="images/recipe-detail.png" alt="Recipe Detail Page">
+
+_For more examples, please refer to the [Documentation](https://example.com)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
