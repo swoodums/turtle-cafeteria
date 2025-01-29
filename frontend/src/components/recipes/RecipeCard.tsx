@@ -18,22 +18,27 @@ import MoreVertIcon from '@mui/icons-material/MoreVert';
 import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import recipeService from '@/services/recipeService';
+import { useRouter } from 'next/navigation';
 
 interface RecipeCardProps {
     recipe: Recipe;
-    onClick?: () => void;
     onEdit?: (recipe: Recipe) => void;
 }
 
-const RecipeCard = ({ recipe, onClick, onEdit }: RecipeCardProps) => {
+const RecipeCard = ({ recipe, onEdit }: RecipeCardProps) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const queryClient = useQueryClient();
+    const router = useRouter();
 
     const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         event.stopPropagation(); // prevent card click even
         setAnchorEl(event.currentTarget);
-    }
+    };
+
+    const handleCardClick = () => {
+        router.push(`recipes/${recipe.id}`);
+    };
 
     const handleClose = () => {
         setAnchorEl(null);
@@ -65,7 +70,7 @@ const RecipeCard = ({ recipe, onClick, onEdit }: RecipeCardProps) => {
                     transition: 'box-shadow 0.3s ease-in-out'
                 }
             }}
-            onClick={onClick}
+            onClick={handleCardClick}
         >
             <IconButton
                 onClick={handleClick}

@@ -51,7 +51,6 @@ export default function RecipeList() {
                 >
                     <RecipeCard
                         recipe={recipe}
-                        onClick={() => {/* We'll add modal logic here later */}}
                         onEdit={(recipe) => {/* We'll add edit logic here later */}}
                     />
                 </Grid2>

@@ -1,6 +1,12 @@
 /* frontend/src/services/recipeService.ts */
 
-import { Recipe, Direction, RecipeIngredient, RecipeIngredientCreate, DirectionCreate, RecipeCreate } from '@/types/recipes';
+import {
+    Recipe,
+    Direction,
+    RecipeIngredient,
+    RecipeIngredientCreate,
+    DirectionCreate,
+    RecipeCreate } from '@/types/recipes';
 import { api } from './api';
 
 export default {
@@ -18,9 +24,27 @@ async function getAllRecipes() {
     return data;
 }
 
-async function getRecipeById(id: number) {
-    const { data } = await api.get<Recipe>(`/recipe/${id}`);
-    return data;
+// async function getRecipeById(id: number) {
+//     const { data } = await api.get<Recipe>(`/recipe/${id}`);
+//     return data;
+// }
+
+async function getRecipeById(id: number): Promise<Recipe> {
+    // First, get the basic recipe data
+    const { data: recipe } = await api.get<Recipe>(`/recipe/${id}`);
+
+    // Then fetch the related data in parallel
+    const [directionsResponse, recipeIngredientsResponse] = await Promise.all([
+        api.get<Direction[]>(`/direction/recipe/${id}`),
+        api.get<RecipeIngredient[]>(`/recipe_ingredients/recipe/${id}`)
+    ]);
+
+    // Combine all the data
+    return{
+        ...recipe,
+        directions: directionsResponse.data,
+        recipe_ingredients: recipeIngredientsResponse.data
+    }
 }
 
 async function deleteRecipeById(id: number) {
