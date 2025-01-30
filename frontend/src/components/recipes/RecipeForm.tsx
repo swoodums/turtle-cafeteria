@@ -32,17 +32,20 @@ export default function RecipeForm({ initialData, mode = 'create' }: RecipeFormP
         if (initialData) {
             return {
                 recipeInfo: {
+                    id: initialData.id,
                     title: initialData.title,
                     description: initialData.description,
                     cooking_time: initialData.cooking_time,
                     servings: initialData.servings
                 },
                 recipeIngredients: initialData.recipe_ingredients?.map(ing => ({
+                    id: ing.id,
                     name: ing.name,
                     quantity: ing.quantity,
                     unit: ing.unit
                 })) || [{ name: '', quantity: 0, unit: '' }],
                 directions: initialData.directions?.map(dir => ({
+                    id: dir.id,
                     direction_number: dir.direction_number,
                     instruction: dir.instruction
                 })) || [{ direction_number: 1, instruction: '' }]
@@ -69,68 +72,66 @@ export default function RecipeForm({ initialData, mode = 'create' }: RecipeFormP
 
                 // Handle directions
                 if (initialData.directions) {
-                    const existingDirections = new Map(
-                        initialData.directions.map(d => [d.direction_number, d])
+                    // First, delete all existing directions that are no longer present.
+                    // Doing this first ensures there's no conflict with direction numbers
+                    const newDirectionIds = new Set(data.directions.map(d => d.id).filter(Boolean));
+                    const deletedDirections = initialData.directions.filter(d => !newDirectionIds.has(d.id));
+                    await Promise.all(
+                        deletedDirections.map(dir => recipeService.deleteDirection(dir.id))
                     );
 
-                    // Update or create each direction
-                    await Promise.all(data.directions.map(async (dir) => {
-                        const existing = existingDirections.get(dir.direction_number);
-                        if (existing) {
-                            // Update it if exists
-                            await recipeService.updateDirection(existing.id, dir);
-                            existingDirections.delete(dir.direction_number);
-                        } else {
-                            // Create if it's new
-                            await recipeService.createDirection(recipe.id, dir);
-                        }
-                    }));
+                    // Then handle updates and creates with reindexed direction numbers
+                    await Promise.all(
+                        data.directions.map(async (dir, index) => {
+                            const directionData = {
+                                direction_number: index + 1,
+                                instruction: dir.instruction
+                            };
 
-                    // Delete any remaining old directions
-                    await Promise.all(
-                        Array.from(existingDirections.values()).map(dir =>
-                            recipeService.deleteDirection(dir.id)
-                        )
-                    );
-                } else {
-                    // If no existing directions, create all
-                    await Promise.all(
-                        data.directions.map(dir =>
-                            recipeService.createDirection(recipe.id, dir)
-                        )
+                            if (dir.id) {
+                                // If direction has an ID, update it
+                                await recipeService.updateDirection(dir.id, directionData);
+                            } else {
+                                // If no ID, it's a new direction
+                                await recipeService.createDirection(recipe.id, directionData);
+                            }
+                        })
                     );
                 }
 
                 // Handle  ingredients
                 if (initialData.recipe_ingredients) {
-                    const existingIngredients = new Map(
-                        initialData.recipe_ingredients.map(ing => [ing.id, ing])
+                    // Update existing ingredients
+                    await Promise.all(
+                        data.recipeIngredients.map(async (ing) => {
+                            if (ing.id) {
+                                // If ingredient has an ID, update it
+                                await recipeService.updateRecipeIngredient(ing.id, {
+                                    name: ing.name,
+                                    quantity: ing.quantity,
+                                    unit: ing.unit
+                                });
+                            } else {
+                                // If no ID, it's a new ingredient
+                                await recipeService.createRecipeIngregient(recipe.id, ing);
+                            }
+                        })
                     );
 
-                    // Update or create each ingredient
-                    await Promise.all(data.recipeIngredients.map(async (ing, index) => {
-                        const existing = initialData.recipe_ingredients?.[index];
-                        if (existing) {
-                            // Update if it exists
-                            await recipeService.updateRecipeIngredient(existing.id, ing);
-                            existingIngredients.delete(existing.id);
-                        } else {
-                            // Create if it's new
-                            await recipeService.createRecipeIngregient(recipe.id, ing);
-                        }
-                    }));
-
-                    // Delete any remaining old ingredients
+                    //Delete removed ingredients
+                    const newIngredientIds = new Set(data.recipeIngredients.map(i => i.id).filter(Boolean));
+                    const deletedIngredients = initialData.recipe_ingredients.filter(i => !newIngredientIds.has(i.id));
                     await Promise.all(
-                        Array.from(existingIngredients.values()).map(ing =>
-                            recipeService.deleteRecipeIngredient(ing.id)
-                        )
+                        deletedIngredients.map(ing => recipeService.deleteRecipeIngredient(ing.id))
                     );
                 } else {
-                    // If no existing ingredients, create all
+                    // No existing directions, create all with sequential numbers
                     await Promise.all(
-                        data.recipeIngredients.map(ing =>
-                            recipeService.createRecipeIngregient(recipe.id, ing)
+                        data.directions.map((dir, index) =>
+                            recipeService.createDirection(recipe.id, {
+                                direction_number: index + 1,
+                                instruction: dir.instruction
+                            })
                         )
                     );
                 }
@@ -140,21 +141,40 @@ export default function RecipeForm({ initialData, mode = 'create' }: RecipeFormP
                 // First create the recipe
                 const recipe = await recipeService.createRecipe(data.recipeInfo);
 
-                // Then add recipe ingredients and directions
+                // Then add recipe ingredients and directions 
                 await Promise.all([
+                    // Create all recipe ingredients
                     ...data.recipeIngredients.map(recipeIngredient =>
-                        recipeService.createRecipeIngregient(recipe.id, recipeIngredient)
+                        recipeService.createRecipeIngregient(recipe.id, {
+                            name: recipeIngredient.name,
+                            quantity: recipeIngredient.quantity,
+                            unit: recipeIngredient.unit
+                        })
                     ),
-                    ...data.directions.map(direction =>
-                        recipeService.createDirection(recipe.id, direction)
+                    // Create all directions with sequential numbers
+                    ...data.directions.map((direction, index) =>
+                        recipeService.createDirection(recipe.id, {
+                            direction_number: index + 1,
+                            instruction: direction.instruction
+                        })
                     )
                 ]);
 
                 return recipe;
             }
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['recipes'] });
+        onSuccess: async (_, varialbes) => {
+            // Invalidate queries
+            await queryClient.invalidateQueries({ queryKey: ['recipes'] });
+            
+            // If we're editing a specific recipe, also invalidate that specific query
+            if (mode === 'edit' && initialData) {
+                await queryClient.invalidateQueries({
+                    queryKey: ['recipe', initialData.id]
+                });
+            }
+
+            // Only navigate after queries are invalidated
             router.push('/recipes');
         },
     });
