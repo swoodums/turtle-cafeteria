@@ -4,16 +4,16 @@
 
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import {
     Box,
     Container,
     Typography,
-    Divider,
+    Button,
     Paper,
     CircularProgress } from '@mui/material';
 import {
     AccessTime as AccessTimeIcon,
-    People,
     People as PeopleIcon } from '@mui/icons-material';
 import recipeService from '@/services/recipeService';
 
@@ -26,6 +26,7 @@ export default function RecipeView({ recipeId } : RecipeViewProps) {
         queryKey: ['recipe', recipeId],
         queryFn: () => recipeService.getRecipeById(recipeId),
     });
+    const router = useRouter();
 
     if (isLoading) {
         return (
@@ -49,7 +50,7 @@ export default function RecipeView({ recipeId } : RecipeViewProps) {
         <Container sx={{ maxWidth: "lg", py: 2 }}>
             <Paper elevation={4}>
                 {/* Header Section */}
-                <Box sx={{ mb: 2 }}>
+                <Box sx={{ mb: 2, p: 2}}>
                     <Typography variant="h3" component="h1" sx={{ mb: 1 }}>
                         {recipe.title}
                     </Typography>
@@ -74,7 +75,7 @@ export default function RecipeView({ recipeId } : RecipeViewProps) {
 
             {/* Ingredients Section */}
             <Paper elevation={4}>
-                <Box sx={{ mb: 3 }}>
+                <Box sx={{ mb: 3, p: 2 }}>
                     <Typography variant="h5" component="h2" sx={{ mb: 1 }}>
                         Ingredients
                     </Typography>
@@ -89,7 +90,7 @@ export default function RecipeView({ recipeId } : RecipeViewProps) {
 
             {/* Directions Section */}
             <Paper elevation={4}>
-                <Box>
+                <Box sx={{ mb: 3, p: 2 }}>
                     <Typography variant="h5" component="h2" sx={{ mb: 1}}>
                         Directions
                     </Typography>
@@ -104,6 +105,13 @@ export default function RecipeView({ recipeId } : RecipeViewProps) {
                     ))}
                 </Box>
             </Paper>
+            <Button
+                type="submit"
+                variant="contained"
+                onClick={() => router.push(`/recipes/${recipe.id}/edit`)}
+            >
+                Edit Recipe
+            </Button>
         </Container>
     );
 }

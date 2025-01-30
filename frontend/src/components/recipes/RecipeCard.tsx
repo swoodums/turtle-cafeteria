@@ -22,10 +22,9 @@ import { useRouter } from 'next/navigation';
 
 interface RecipeCardProps {
     recipe: Recipe;
-    onEdit?: (recipe: Recipe) => void;
 }
 
-const RecipeCard = ({ recipe, onEdit }: RecipeCardProps) => {
+const RecipeCard = ({ recipe }: RecipeCardProps) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const open = Boolean(anchorEl);
     const queryClient = useQueryClient();
@@ -45,17 +44,24 @@ const RecipeCard = ({ recipe, onEdit }: RecipeCardProps) => {
     };
 
     const deleteRecipeMutation = useMutation({
-        mutationFn: (id: number) => recipeService.deleteRecipeById(id),
+        mutationFn: (id: number) => recipeService.deleteRecipe(id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['recipes'] });
         },
     });
 
+    
     const handleDelete = (event: React.MouseEvent) => {
         event.stopPropagation();
         if (confirm('Are you sure you want to delete this recipe?')) {
             deleteRecipeMutation.mutate(recipe.id);
         }
+        handleClose();
+    };
+
+    const handleEdit = (event: React.MouseEvent) => {
+        event.stopPropagation();
+        router.push(`/recipes/${recipe.id}/edit`);
         handleClose();
     };
 
@@ -88,6 +94,7 @@ const RecipeCard = ({ recipe, onEdit }: RecipeCardProps) => {
                 open={open}
                 onClose={handleClose}
             >
+                <MenuItem onClick={handleEdit}>Edit</MenuItem>
                 <MenuItem onClick={handleDelete}>Delete</MenuItem>
             </Menu>
             <CardContent>

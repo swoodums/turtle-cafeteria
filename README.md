@@ -105,11 +105,11 @@ The backend is built with FastAPI and SQLite.  The front end is built with Next.
 ### Front End
 - [x] Build out barebones frontend
 - [x] Verify end-to-end function with backend
-- [ ] Move create/edit recipe functionality to pages instead of modals
+- [x] Move create/edit recipe functionality to pages instead of modals
   - [x] Recipe form
   - [x] Create recipe page
   - [x] View recipe page
-  - [ ] Edit recipe page
+  - [x] Edit recipe page
 - [x] Add navigation
 - [ ] Create page for creating/editing ingredients
 - [ ] Add testing

@@ -16,43 +16,165 @@ import{
     Typography
 } from '@mui/material';
 import { Add as AddIcon, Delete as DeleteIcon } from '@mui/icons-material';
-import { RecipeFormData } from '@/types/recipes';
+import { Recipe, RecipeFormData } from '@/types/recipes';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import recipeService from '@/services/recipeService';
 
-export default function RecipeForm() {
+interface RecipeFormProps {
+    initialData?: Recipe;
+    mode?: 'create' | 'edit';
+}
+
+export default function RecipeForm({ initialData, mode = 'create' }: RecipeFormProps) {
     const queryClient = useQueryClient();
     const router = useRouter();
-    const [formData, setFormData] = useState<RecipeFormData>({
-        recipeInfo: {
-            title: '',
-            description: '',
-            cooking_time: '' as any,
-            servings: 1
-        },
-        recipeIngredients: [{ name: '', quantity: 0, unit: '' }],
-        directions: [{ direction_number: 1, instruction: '' }]
+    const [formData, setFormData] = useState<RecipeFormData>(() => {
+        if (initialData) {
+            return {
+                recipeInfo: {
+                    id: initialData.id,
+                    title: initialData.title,
+                    description: initialData.description,
+                    cooking_time: initialData.cooking_time,
+                    servings: initialData.servings
+                },
+                recipeIngredients: initialData.recipe_ingredients?.map(ing => ({
+                    id: ing.id,
+                    name: ing.name,
+                    quantity: ing.quantity,
+                    unit: ing.unit
+                })) || [{ name: '', quantity: 0, unit: '' }],
+                directions: initialData.directions?.map(dir => ({
+                    id: dir.id,
+                    direction_number: dir.direction_number,
+                    instruction: dir.instruction
+                })) || [{ direction_number: 1, instruction: '' }]
+            };
+        }
+
+        return {
+            recipeInfo: {
+                title: '',
+                description: '',
+                cooking_time: '' as any,
+                servings: 1
+            },
+            recipeIngredients: [{ name: '', quantity: 0, unit: '' }],
+            directions: [{ direction_number: 1, instruction: '' }]
+        };
     });
 
-    const createRecipeMutation = useMutation({
+    const recipeMutation = useMutation({
         mutationFn: async (data: RecipeFormData) => {
-            // First create the recipe
-            const recipe = await recipeService.createRecipe(data.recipeInfo);
+            if (mode === 'edit' && initialData) {
+                //Update the recipe
+                const recipe = await recipeService.updateRecipe(initialData.id, data.recipeInfo);
 
-            // Then add recipe ingredients and directions
-            await Promise.all([
-                ...data.recipeIngredients.map(recipeIngredient =>
-                    recipeService.createRecipeIngregient(recipe.id, recipeIngredient)
-                ),
-                ...data.directions.map(direction =>
-                    recipeService.createDirection(recipe.id, direction)
-                )
-            ]);
+                // Handle directions
+                if (initialData.directions) {
+                    // First, delete all existing directions that are no longer present.
+                    // Doing this first ensures there's no conflict with direction numbers
+                    const newDirectionIds = new Set(data.directions.map(d => d.id).filter(Boolean));
+                    const deletedDirections = initialData.directions.filter(d => !newDirectionIds.has(d.id));
+                    await Promise.all(
+                        deletedDirections.map(dir => recipeService.deleteDirection(dir.id))
+                    );
 
-            return recipe;
+                    // Then handle updates and creates with reindexed direction numbers
+                    await Promise.all(
+                        data.directions.map(async (dir, index) => {
+                            const directionData = {
+                                direction_number: index + 1,
+                                instruction: dir.instruction
+                            };
+
+                            if (dir.id) {
+                                // If direction has an ID, update it
+                                await recipeService.updateDirection(dir.id, directionData);
+                            } else {
+                                // If no ID, it's a new direction
+                                await recipeService.createDirection(recipe.id, directionData);
+                            }
+                        })
+                    );
+                }
+
+                // Handle  ingredients
+                if (initialData.recipe_ingredients) {
+                    // Update existing ingredients
+                    await Promise.all(
+                        data.recipeIngredients.map(async (ing) => {
+                            if (ing.id) {
+                                // If ingredient has an ID, update it
+                                await recipeService.updateRecipeIngredient(ing.id, {
+                                    name: ing.name,
+                                    quantity: ing.quantity,
+                                    unit: ing.unit
+                                });
+                            } else {
+                                // If no ID, it's a new ingredient
+                                await recipeService.createRecipeIngregient(recipe.id, ing);
+                            }
+                        })
+                    );
+
+                    //Delete removed ingredients
+                    const newIngredientIds = new Set(data.recipeIngredients.map(i => i.id).filter(Boolean));
+                    const deletedIngredients = initialData.recipe_ingredients.filter(i => !newIngredientIds.has(i.id));
+                    await Promise.all(
+                        deletedIngredients.map(ing => recipeService.deleteRecipeIngredient(ing.id))
+                    );
+                } else {
+                    // No existing directions, create all with sequential numbers
+                    await Promise.all(
+                        data.directions.map((dir, index) =>
+                            recipeService.createDirection(recipe.id, {
+                                direction_number: index + 1,
+                                instruction: dir.instruction
+                            })
+                        )
+                    );
+                }
+
+                return recipe;
+            } else {
+                // First create the recipe
+                const recipe = await recipeService.createRecipe(data.recipeInfo);
+
+                // Then add recipe ingredients and directions 
+                await Promise.all([
+                    // Create all recipe ingredients
+                    ...data.recipeIngredients.map(recipeIngredient =>
+                        recipeService.createRecipeIngregient(recipe.id, {
+                            name: recipeIngredient.name,
+                            quantity: recipeIngredient.quantity,
+                            unit: recipeIngredient.unit
+                        })
+                    ),
+                    // Create all directions with sequential numbers
+                    ...data.directions.map((direction, index) =>
+                        recipeService.createDirection(recipe.id, {
+                            direction_number: index + 1,
+                            instruction: direction.instruction
+                        })
+                    )
+                ]);
+
+                return recipe;
+            }
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['recipes'] });
+        onSuccess: async (_, varialbes) => {
+            // Invalidate queries
+            await queryClient.invalidateQueries({ queryKey: ['recipes'] });
+            
+            // If we're editing a specific recipe, also invalidate that specific query
+            if (mode === 'edit' && initialData) {
+                await queryClient.invalidateQueries({
+                    queryKey: ['recipe', initialData.id]
+                });
+            }
+
+            // Only navigate after queries are invalidated
             router.push('/recipes');
         },
     });
@@ -98,7 +220,7 @@ export default function RecipeForm() {
     const handleRemoveRecipeIngredient = (index: number) => {
         setFormData(prev => ({
             ...prev,
-            recipeIngredients: prev.recipeIngredients.filter((_, i) => 1 !== index)
+            recipeIngredients: prev.recipeIngredients.filter((_, i) => i !== index)
         }));
     };
 
@@ -139,12 +261,15 @@ export default function RecipeForm() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        createRecipeMutation.mutate(formData);
+        recipeMutation.mutate(formData);
     };
 
     return(
         <Container maxWidth="lg" className="py-8">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={(e) => {
+                e.preventDefault();
+                recipeMutation.mutate(formData);
+            }}>
                 <Card>
                     <CardContent>
                         <Stack spacing={4}>
@@ -250,7 +375,6 @@ export default function RecipeForm() {
                                                 onClick={() => handleRemoveRecipeIngredient(index)}
                                                 disabled={formData.recipeIngredients.length === 1}
                                                 color="error"
-                                                sx={{ mt: 0 }}
                                             >
                                                 <DeleteIcon />
                                             </IconButton>
@@ -342,9 +466,9 @@ export default function RecipeForm() {
                                 <Button
                                     type="submit"
                                     variant="contained"
-                                    disabled={createRecipeMutation.isPending}
+                                    disabled={recipeMutation.isPending}
                                 >
-                                    Create Recipe
+                                    {mode === 'edit' ? 'Update Recipe' : 'Create Recipe'}
                                 </Button>
                             </Box>
                         </Stack>
