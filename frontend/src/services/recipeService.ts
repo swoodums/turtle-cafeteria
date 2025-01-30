@@ -12,10 +12,15 @@ import { api } from './api';
 export default {
     getAllRecipes,
     getRecipeById,
-    deleteRecipeById,
+    deleteRecipe,
+    updateRecipe,
     createRecipe,
     createDirection,
-    createRecipeIngregient
+    updateDirection,
+    deleteDirection,
+    createRecipeIngregient,
+    updateRecipeIngredient,
+    deleteRecipeIngredient
 }
 
 
@@ -23,11 +28,6 @@ async function getAllRecipes() {
     const { data } = await api.get<Recipe[]>('/recipe/');
     return data;
 }
-
-// async function getRecipeById(id: number) {
-//     const { data } = await api.get<Recipe>(`/recipe/${id}`);
-//     return data;
-// }
 
 async function getRecipeById(id: number): Promise<Recipe> {
     // First, get the basic recipe data
@@ -47,7 +47,7 @@ async function getRecipeById(id: number): Promise<Recipe> {
     }
 }
 
-async function deleteRecipeById(id: number) {
+async function deleteRecipe(id: number) {
     await api.delete<Recipe>(`/recipe/${id}`);
 }
 
@@ -56,12 +56,35 @@ async function createRecipe(recipe: RecipeCreate) {
     return data;
 }
 
+async function updateRecipe(id: number, recipe: RecipeCreate) {
+    const { data } = await api.put<Recipe>(`/recipe/${id}`, recipe)
+    return data;
+}
+
 async function createDirection(recipeId: number, direction: DirectionCreate) {
     const { data } = await api.post<Direction>(`/direction/recipe/${recipeId}`, direction);
     return data;
 }
 
+async function updateDirection(id: number, direction: DirectionCreate) {
+    const { data } = await api.put<Direction>(`/direction/${id}`, direction)
+    return data;
+}
+
+async function deleteDirection(id: number) {
+    await api.delete(`/direction/${id}`)
+}
+
 async function createRecipeIngregient(recipeId: number, recipeIngredient: RecipeIngredientCreate) {
     const { data } = await api.post<RecipeIngredient>(`/recipe_ingredients/recipe/${recipeId}`, recipeIngredient);
     return data;
+}
+
+async function updateRecipeIngredient(id: number, recipeIngredient: RecipeIngredientCreate) {
+    const { data } = await api.put<RecipeIngredient>(`/recipe_ingredients/${id}`, recipeIngredient);
+    return data;
+}
+
+async function deleteRecipeIngredient(id: number) {
+    await api.delete(`/recipe_ingredients/${id}`);
 }
