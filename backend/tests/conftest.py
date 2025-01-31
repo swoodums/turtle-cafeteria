@@ -115,6 +115,17 @@ def sample_recipe_ingredient():
     }
 
 @pytest.fixture
+def sample_schedule():
+    """
+    Provide sample schedule data
+    """
+    return {
+        "start_date": "2025-01-05",
+        "end_date": "2025-01-06",
+        "notes": "A really cool date"
+    }
+
+@pytest.fixture
 def created_recipe(client, sample_recipe):
     """
     Create a recipe in the database and return its data.
@@ -143,5 +154,16 @@ def created_recipe_ingredient(client, created_recipe, sample_recipe_ingredient):
     response = client.post(
         f"/api/v1/recipe_ingredients/recipe/{created_recipe['id']}",
         json=sample_recipe_ingredient
+    )
+    return response.json()
+
+@pytest.fixture
+def created_schedule(client, created_recipe, sample_schedule):
+    """
+    Create a schedule for a recipe and return its data
+    """
+    response = client.post(
+        f"/api/v1/schedule/recipe/{created_recipe['id']}",
+        json=sample_schedule
     )
     return response.json()

@@ -3,6 +3,7 @@ uvicorn
 pydantic
 typing
 sqlalchemy
+alembic
 bcrypt
 python-multipart
 pytest
