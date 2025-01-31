@@ -1,6 +1,7 @@
 from typing import List, Optional
 from sqlalchemy import Text, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
+from app.models.schedule_model import Schedule
 
 class Base(DeclarativeBase):
     pass
@@ -27,6 +28,13 @@ class Recipe(Base):
     #Relationship to recipe_ingredients
     recipe_ingredients: Mapped[List["RecipeIngredient"]] = relationship(
         "RecipeIngredient",
+        back_populates="recipe",
+        cascade="all, delete-orphan"
+    )
+
+    # In the Recipe class
+    schedules: Mapped[List["Schedule"]] = relationship(
+        "Schedule",
         back_populates="recipe",
         cascade="all, delete-orphan"
     )
