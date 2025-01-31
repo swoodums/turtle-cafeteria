@@ -79,7 +79,7 @@ def get_schedule(
     return schedule
 
 @router.get(
-    "/range",
+    "/range/",
     response_model=List[schedule_schema.Schedule],
     tags=["Calendar"]
 )
@@ -92,7 +92,7 @@ def get_schedules_by_date_Range(
     Get all schedules within a date range (across all recipes)
     Primary endpoint for calendar view
     """
-    schedules = db.query(schedule_model.SChedule).filter(
+    schedules = db.query(schedule_model.Schedule).filter(
         schedule_model.Schedule.start_date <= end_date,
         schedule_model.Schedule.end_date >= start_date
     ).all()
@@ -121,7 +121,7 @@ def update_schedule(
         )
     
     # Update fields
-    for key, value in schedule_update.model_dump(exclude_unset=True).itmes():
+    for key, value in schedule_update.model_dump(exclude_unset=True).items():
         setattr(db_schedule, key, value)
 
     try:
@@ -151,8 +151,8 @@ def delete_schedule(
 
     if db_schedule is None:
         raise HTTPException(
-            status_code=status.HTTP_404_BAD_REQUEST,
-            detail="fSchedule with id {schedule_id} not found"
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Schedule with id {schedule_id} not found"
         )
     
     db.delete(db_schedule)

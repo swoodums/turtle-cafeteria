@@ -1,10 +1,9 @@
+# backend/app/models/recipe_model.py
+
 from typing import List, Optional
 from sqlalchemy import Text, ForeignKey, UniqueConstraint
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from app.models.schedule_model import Schedule
-
-class Base(DeclarativeBase):
-    pass
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from app.models.base import Base
 
 class Recipe(Base):
     """

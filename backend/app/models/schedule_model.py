@@ -1,11 +1,10 @@
+# backend/app/models/schedule_model.py
+
 from typing import Optional
 from datetime import date
 from sqlalchemy import Text, ForeignKey, Date, CheckConstraint
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
-from app.models.recipe_model import Recipe
-
-class Base(DeclarativeBase):
-    pass
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from app.models.base import Base
 
 class Schedule(Base):
     """
