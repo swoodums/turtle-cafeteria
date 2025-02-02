@@ -10,43 +10,66 @@ import {
     ListItem,
     ListItemText,
     ListItemButton,
+    ListItemIcon,
     Typography,
     Divider } from '@mui/material'
 import {
     usePathname,
     useRouter } from 'next/navigation';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
+import MenuBookIcon from '@mui/icons-material/MenuBook';
+import AddCircleIcon from '@mui/icons-material/AddCircle';
 
 const DRAWER_WIDTH = 240;
 
 const NAVIGATION_ITEMS = [
     {
-        title: 'Recipes ✨',
+        title: 'Recipes',
         path: '/recipes',
+        icon: <MenuBookIcon/>
     },
     {
-        title: 'Create Recipe 🍽️',
+        title: 'Create Recipe',
         path: '/recipes/new',
+        icon: <AddCircleIcon/>
+    },
+    {
+        title: 'Weekly Calendar',
+        path: '/schedule',
+        icon: <CalendarMonthIcon/>
     }
 ];
 
-export default function SidebarNav() {
+interface SidebarNavProps {
+    open: boolean;
+    onClose: () => void;
+}
+
+export default function SidebarNav({ open, onClose }: SidebarNavProps) {
     const router = useRouter();
     const pathname = usePathname();
 
+    // Handle navigation and drawer closing
+    const handleNavigation = (path: string) => {
+        router.push(path);
+        onClose(); // Clsoe drawer after navigation
+    };
+
     return (
         <Drawer
-            variant="permanent"
+            open={open}
+            onClose={onClose}
             sx={{
                 width: DRAWER_WIDTH,
                 flexShrink: 0,
                 position: 'fixed',
-                height: '100%',
+                // height: '100%',
                 '& .MuiDrawer-paper': {
                     width: DRAWER_WIDTH,
                     boxSizing: 'border-box',
-                    borderRight: '2px solid rgba(0, 0, 0, 0.12)',
+                    // borderRight: '2px solid rgba(0, 0, 0, 0.12)',
                     backgroundColor: 'background.paper',
-                    position: 'fixed',
+                    // position: 'fixed',
                 },
             }}
         >
@@ -66,9 +89,12 @@ export default function SidebarNav() {
                         <ListItem key={item.path} disablePadding>
                             <ListItemButton
                                 selected={pathname === item.path}
-                                onClick={() => router.push(item.path)}
+                                onClick={() => handleNavigation(item.path)}
                             >
-                                <ListItemText primary={item.title} />
+                                <ListItemIcon>
+                                    {item.icon}
+                                </ListItemIcon>
+                                <ListItemText primary={item.title}/>
                             </ListItemButton>
                         </ListItem>
                     ))}

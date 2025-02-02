@@ -1,8 +1,7 @@
 /* frontend/src/app/layout.tsx */
 
 import { Providers } from './providers';
-import { Box } from '@mui/material'
-import SidebarNav from '@/components/navigation/Sidebar';
+import Layout from '@/components/navigation/Layout';
 
 export default function RootLayout({
   children,
@@ -13,28 +12,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <Providers>
-          <Box sx={{
-            display: 'flex',
-            minHeight: '100vh',
-            position: 'relative' 
-          }}>
-            <SidebarNav />
-            <Box
-              component="main"
-              sx={{
-                flexGrow: 1,
-                p: 3,
-                pt: 8,
-                minHeight: '100vh',
-                marginLeft: '0px',
-                width: '100%',
-              }}
-            >
-              {children}
-            </Box>
-          </Box>
+          <Layout>{children}</Layout>
         </Providers>
       </body>
     </html>
-  )
+  );
 }
