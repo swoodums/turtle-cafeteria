@@ -95,8 +95,8 @@ The backend is built with FastAPI and SQLite.  The front end is built with Next.
 - [x] Add middleware to allow frontend communication
 - [x] Build out data structures for Recipe Ingredients
 - [x] Build out routes for Recipe Ingredients
-- [ ] Build out data structures for scheduling
-- [ ] Build out routes for scheduling
+- [x] Build out data structures for scheduling
+- [x] Build out routes for scheduling
 - [ ] Build out data structures for Ingredients
 - [ ] Build out routes for Ingredients
 - [ ] Integrate Ingredients into backend flow
@@ -111,9 +111,9 @@ The backend is built with FastAPI and SQLite.  The front end is built with Next.
   - [x] View recipe page
   - [x] Edit recipe page
 - [x] Add navigation
+- [ ] Create page for scheduling
 - [ ] Create page for creating/editing ingredients
 - [ ] Add testing
-- [ ] Create page for scheduling
 - [ ] Flesh out idea for images
 
 

@@ -6,6 +6,7 @@ entity_relationship.drawio
 backend/*.db
 backend/app/*.db
 *.db
+sql_app.db
 backend/.coverage
 **/__pycache__/
 *.pyc
