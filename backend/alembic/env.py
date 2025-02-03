@@ -13,9 +13,6 @@ from pathlib import Path
 sys.path.append(str(Path(__file__).parents[1]))
 
 from app.database import SQLALCHEMY_DATABASE_URL, BASE_DIR
-print(f"BASE_DIR: {BASE_DIR}")
-print(f"SQLALCHEMY_DATABASE_URL: {SQLALCHEMY_DATABASE_URL}")
-print(f"Current working directory: {os.getcwd()}")
 
 from app.models import Base, Recipe, RecipeIngredient, Direction, Schedule
 

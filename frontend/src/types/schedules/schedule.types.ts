@@ -6,6 +6,7 @@ export interface Schedule {
     recipe_id: number;
     start_date: string;
     end_date: string;
+    meal_type?: string;
     notes?: string;
     recipe?: Recipe;        // Optional recipe details when expanded
 }
@@ -14,6 +15,7 @@ export interface Schedule {
 export interface ScheduleCreate {
     start_date: string;
     end_date: string;
+    meal_type?: string;
     notes?: string;
 }
 
@@ -21,5 +23,6 @@ export interface ScheduleCreate {
 export interface ScheduleUpdate {
     start_date?: string;
     end_date?: string;
+    meal_type?: string
     notes?: string;
 }

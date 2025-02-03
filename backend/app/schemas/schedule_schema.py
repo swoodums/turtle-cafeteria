@@ -8,6 +8,7 @@ from app.schemas.recipe_schema import Recipe
 class ScheduleBase(BaseModel):
     start_date: date
     end_date: date
+    meal_type: Optional[str] = None
     notes: Optional[str] = None
 
     @field_validator('end_date')
@@ -24,6 +25,7 @@ class ScheduleCreate(ScheduleBase):
 class ScheduleUpdate(BaseModel):
     start_date: Optional[date] = None
     end_date: Optional[date] = None
+    meal_type: Optional[str] = None
     notes: Optional[str] = None
 
     @field_validator('end_date')

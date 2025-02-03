@@ -16,6 +16,7 @@ class Schedule(Base):
     recipe_id: Mapped[int] = mapped_column(ForeignKey("recipes.id"))
     start_date: Mapped[date] = mapped_column(Date)
     end_date: Mapped[date] = mapped_column(Date)
+    meal_type: Mapped[Optional[str]] = mapped_column()
     notes: Mapped[Optional[str]] = mapped_column(Text, nullable=True)
 
     # Relationship to recipes

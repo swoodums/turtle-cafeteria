@@ -8,10 +8,10 @@ import {
     Box,
     Typography,
     IconButton,
-    Grid2,
     Stack,
     Tooltip, 
-    Paper} from '@mui/material';
+    Paper,
+    Chip } from '@mui/material';
 import {
     ChevronLeft,
     ChevronRight,
@@ -19,6 +19,26 @@ import {
 } from '@mui/icons-material'
 import scheduleService from '@/services/scheduleService';
 import { Schedule } from '@/types/schedules/schedule.types';
+
+const MEAL_TYPE_COLORS = {
+    breakfast: {
+        light: '#f7e2b4', // Light yellow
+        main: '#f4d793', // Yellow
+        text: '#000000'  // Black text for contrast
+    },
+    lunch: {
+        light: '#c5d1b9', // Light green
+        main: '#889e73', // Green
+        text: '#000000'  // Black text for contrast
+    },
+    dinner: {
+        light: '#dab3b3', // Light red
+        main: '#a94a4a', // Red
+        text: '#000000'  // Black text for contrast
+    }
+} as const;
+
+type MealType = keyof typeof MEAL_TYPE_COLORS
 
 export default function WeeklyCalendar() {
     const [ currentWeek, setCurrentWeek ] = useState(() => {
@@ -55,20 +75,38 @@ export default function WeeklyCalendar() {
         return date;
     });
 
+    // Define meal type priority order for showing scheduled recipes in order
+    const MEAL_TYPE_ORDER = {
+        'breakfast': 0,
+        'lunch': 1,
+        'dinner': 2
+    } as const
+
     // Get schedules for a specific date
     const getSchedulesForDate = (date: Date) => {
         if (!schedules) return [];
-        const dateStr = date.toISOString().split('T')[0];
-        return schedules.filter(schedule => {
-            const startDate = new Date(schedule.start_date);
-            const endDate = new Date(schedule.end_date);
-            const checkDate = new Date(date);
-            // Reset times to compare dates only
-            startDate.setHours(0, 0, 0, 0);
-            endDate.setHours(0, 0, 0, 0);
-            checkDate.setHours(0, 0, 0, 0);
-            return checkDate >= startDate && checkDate <= endDate;
-        });
+        const checkDateStr = date.toISOString().split('T')[0];
+        return schedules
+            .filter(schedule => {
+                // Direct string comparison since all dates are in YYY-MM-DD format
+                return checkDateStr >= schedule.start_date && checkDateStr <= schedule.end_date;
+            })
+            .sort((a, b) => {
+                // Convert meal types to lowercase for case-insensitive comparison
+                const typeA = (a.meal_type?.toLowerCase() || 'dinner');
+                const typeB = (b.meal_type?.toLowerCase() || 'dinner');
+                // Get priorit order (defaults to dinner)
+                const orderA = MEAL_TYPE_ORDER[typeA as keyof typeof MEAL_TYPE_ORDER] ?? MEAL_TYPE_ORDER.dinner;
+                const orderB = MEAL_TYPE_ORDER[typeB as keyof typeof MEAL_TYPE_ORDER] ?? MEAL_TYPE_ORDER.dinner;
+                
+                return orderA - orderB;
+            });
+    };
+
+    // Get color scheme based on meal type
+    const getMealTypeColors = (mealType: string | undefined) => {
+        const type = (mealType?.toLowerCase() || 'dinner') as MealType;
+        return MEAL_TYPE_COLORS[type] || MEAL_TYPE_COLORS.dinner
     };
 
     return (
@@ -159,19 +197,11 @@ export default function WeeklyCalendar() {
 
                             {/* Scheduled Recipes */}
                             <Stack spacing={1}>
-                                {getSchedulesForDate(date).map((schedule) => (
-                                    <Paper
-                                        key={schedule.id}
-                                        sx={{
-                                            p: 2,
-                                            backgroundColor: 'primary.light',
-                                            cursor: 'pointer',
-                                            '&:hover': {
-                                                backgroundColor: 'primary.main',
-                                            }
-                                        }}
-                                    >
+                                {getSchedulesForDate(date).map((schedule) => {
+                                    const colors  = getMealTypeColors(schedule.meal_type);
+                                    return(
                                         <Tooltip
+                                        key={schedule.id}
                                             title={
                                                 <Box sx={{ p: 1 }}>
                                                     <Typography
@@ -186,20 +216,54 @@ export default function WeeklyCalendar() {
                                                         display="block"
                                                         sx={{ mb: 0.5 }}
                                                     >
-                                                        👥 {schedule.recipe?.servings} minutes
+                                                        👥 Serves {schedule.recipe?.servings}
                                                     </Typography>
                                                 </Box>
                                             }
                                             arrow
-                                            enterDelay={500}
-                                            leaveDelay={200}
+                                            enterDelay={1}
+                                            leaveDelay={1}
                                         >
-                                            <Typography variant="body2" noWrap>
-                                                {schedule.recipe?.title}
-                                            </Typography>
+                                            <Paper
+                                                sx={{
+                                                    p: 2,
+                                                    backgroundColor: colors.light,
+                                                    cursor: 'pointer',
+                                                    '&:hover': {
+                                                        backgroundColor: colors.main,
+                                                        '& .MuiTypography-root': {
+                                                            color: colors.text
+                                                        }
+                                                    }
+                                                }}
+                                            >
+                                                <Box sx={{
+                                                    display: 'flex',
+                                                    justifyContent: 'space-between',
+                                                    alignItems: 'center'
+                                                }}>
+                                                    
+                                                        <Typography variant="body2" noWrap sx={{ flex: 1 }}>
+                                                            {schedule.recipe?.title}
+                                                        </Typography>
+                                                    {schedule.meal_type && (
+                                                        <Chip
+                                                            label={schedule.meal_type}
+                                                            variant="outlined"
+                                                            size="small" 
+                                                            sx={{
+                                                                ml: 1,
+                                                                bgcolor: colors.main,
+                                                                color: colors.text,
+                                                                fontSize: '0.75rem'
+                                                            }}
+                                                        />
+                                                    )}
+                                                </Box>
+                                            </Paper>
                                         </Tooltip>
-                                    </Paper>
-                                ))}
+                                    );
+                                })}
                             </Stack>
                         </Paper> 
                     ))}
