@@ -22,7 +22,7 @@
     
 <h3 align="center">Project turtle-cafeteria</h3>
     <p align="center">
-        A learning project for the meal-planning app turtle-tray.
+        A learning project for the meal-planning app Turtle Cafeteria.
         <br />
     </p>
 </div>
@@ -66,7 +66,7 @@ The objective of this project is to build  a meal-planning application.  The goa
 
 We are building this first as a web app.  My personal requirements are to have this accessible on a laptop and on mobile devices.  In my household, that means a Windows, Linux, and Mac laptop, as well as Android and iOS mobile devices!  A web app allows this and keeps the scope reasonable.  We chose Next.js so we have the option to go towards a Progressive Web Application (PWA) later.
 
-The backend is built with FastAPI and SQLite.  The front end is built with Next.js on top of React.  The goal will be to package all of it in a docker container, but for now we're keeping the plates spinning separately.
+The backend is built with FastAPI and SQLite.  The front end is built with Next.js and uses Material UI.  The goal will be to package all of it in a docker container, but for now we're keeping the plates spinning separately.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -79,6 +79,7 @@ The backend is built with FastAPI and SQLite.  The front end is built with Next.
 * SQLite
 * React
 * Next.js
+* Material UI
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -95,8 +96,8 @@ The backend is built with FastAPI and SQLite.  The front end is built with Next.
 - [x] Add middleware to allow frontend communication
 - [x] Build out data structures for Recipe Ingredients
 - [x] Build out routes for Recipe Ingredients
-- [ ] Build out data structures for scheduling
-- [ ] Build out routes for scheduling
+- [x] Build out data structures for scheduling
+- [x] Build out routes for scheduling
 - [ ] Build out data structures for Ingredients
 - [ ] Build out routes for Ingredients
 - [ ] Integrate Ingredients into backend flow
@@ -111,9 +112,10 @@ The backend is built with FastAPI and SQLite.  The front end is built with Next.
   - [x] View recipe page
   - [x] Edit recipe page
 - [x] Add navigation
+- [x] Create page for scheduling
+- [ ] Add drag and drop scheduling
 - [ ] Create page for creating/editing ingredients
 - [ ] Add testing
-- [ ] Create page for scheduling
 - [ ] Flesh out idea for images
 
 
@@ -139,6 +141,27 @@ What good is learning without dreaming about what it could do?  Here are some dr
 * Inventory system to compare against what is already on hand
   * Ability to see expiration dates - trending towards a Home Ec ERP
   * If we're dreaming really big, some computer vision to scan what's in the fridge and pantry.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- USAGE EXAMPLES -->
+## Usage
+
+Use the navigation bar on the left to drive!
+
+<img src="images/recipe-page.png" alt="Main Page">
+
+Click on a recipe card to view the whole recipe!
+
+<img src="images/recipe-detail.png" alt="Recipe Detail Page">
+
+Create a new recipe!
+<img src="images/create_recipe.png" alt="Create Recipe Page">
+
+Schedule a recipe for a date!
+<img src="images/schedule_recipe.png" alt="Schedule Recipe Page">
+
+_For more examples, please refer to the [Documentation](https://example.com)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -186,23 +209,6 @@ Lorem ipsum
     ```
 5. To access the app, navigate to http://localhost:3000/recipes
 6. To view the back end API documentation, go to http://127.0.0.1:8000/docs#/ or http://127.0.0.1:8000/redoc
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-Use the navigation bar on the left to drive!
-
-<img src="images/recipe-page.png" alt="Main Page">
-
-Click on a recipe card to view the whole recipe!
-
-<img src="images/recipe-detail.png" alt="Recipe Detail Page">
-
-_For more examples, please refer to the [Documentation](https://example.com)_
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

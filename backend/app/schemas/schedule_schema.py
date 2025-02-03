@@ -1,6 +1,7 @@
 from datetime import date
 from typing import Optional
 from pydantic import BaseModel, ConfigDict, field_validator
+from app.schemas.recipe_schema import Recipe
 
 # Schedule schemas
 
@@ -37,5 +38,6 @@ class ScheduleUpdate(BaseModel):
 
 class Schedule(ScheduleBase):
     id: int
-    recipe_id: int 
+    recipe_id: int
+    recipe: Recipe      # Enrich API response to include all recipe base data
     model_config=ConfigDict(from_attributes=True)
