@@ -9,12 +9,13 @@ import {
     Typography,
     IconButton,
     Grid2,
+    Stack,
     Tooltip, 
     Paper} from '@mui/material';
 import {
     ChevronLeft,
     ChevronRight,
-    Add as AddIcon
+    Add as AddIcon,
 } from '@mui/icons-material'
 import scheduleService from '@/services/scheduleService';
 import { Schedule } from '@/types/schedules/schedule.types';
@@ -71,13 +72,20 @@ export default function WeeklyCalendar() {
     };
 
     return (
-        <Box sx={{ width: '100%', p: 3 }}>
-            {/* Calendar Header */}
+        <Box sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+            width: '100%',
+        }}>
+            {/* Fixed Calendar Header */}
             <Box sx={{
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                mb: 3
+                p: 2,
+                borderBottom: 1,
+                borderColor: 'divider'
             }}>
                 <Typography variant="h4">
                     Recipe Schedule
@@ -106,24 +114,34 @@ export default function WeeklyCalendar() {
                 </Box>
             </Box>
 
-            {/* Calendar Grid */}
-            <Grid2 container spacing={2}>
-                {weekDates.map((date) => (
-                    <Grid2
-                        key={date.toISOString()}
-                        size={{ xs: 12, sm: 6, md: 4 }}
-                    >
-                        <Paper sx={{
-                            p: 2,
-                            height: '200px',
-                            backgroundColor: 'background.default',
-                            position: 'relative'
+            {/* Calendar Days - Vertical Stack */}
+            <Box sx={{
+                flexGrow: 1,
+                overflowY: 'auto',
+                px: 2,
+                pb: 2,
+                '::-webkit-scrollbar-track': {
+                    background: 'transparent',
+                },
+                '::-webkit-scrollbar-thumb': {
+                    background: 'rgba(0, 0, 0, 0.1)',
+                    borderRadius: '4px',
+                },
+            }}>
+                <Stack spacing={2}>
+                    {weekDates.map((date) => (
+                        <Paper
+                            key={date.toISOString()}
+                                sx={{
+                                p: 2,
+                                backgroundColor: 'background.default',
+                                width: '100%'
                         }}>
                             <Box sx={{
                                 display: 'flex',
                                 justifyContent: 'space-between',
                                 alignItems: 'center',
-                                mb: 1
+                                mb: 2
                             }}>
                                 <Typography variant="subtitle1">
                                     {date.toLocaleDateString('en-US', {
@@ -133,23 +151,19 @@ export default function WeeklyCalendar() {
                                     })}
                                 </Typography>
                                 <Tooltip title="Add Recipe">
-                                    <IconButton size="small">
+                                    <IconButton>
                                         <AddIcon />
                                     </IconButton>
                                 </Tooltip>
                             </Box>
 
                             {/* Scheduled Recipes */}
-                            <Box sx={{
-                                overlfowY: 'auto',
-                                height: 'calc(100% - 40px)'
-                            }}>
+                            <Stack spacing={1}>
                                 {getSchedulesForDate(date).map((schedule) => (
                                     <Paper
                                         key={schedule.id}
                                         sx={{
-                                            p: 1,
-                                            mb: 1,
+                                            p: 2,
                                             backgroundColor: 'primary.light',
                                             cursor: 'pointer',
                                             '&:hover': {
@@ -157,16 +171,40 @@ export default function WeeklyCalendar() {
                                             }
                                         }}
                                     >
-                                        <Typography variant="body2" noWrap>
-                                            {schedule.recipe?.title || `Recipe ${schedule.recipe_id}`}
-                                        </Typography>
+                                        <Tooltip
+                                            title={
+                                                <Box sx={{ p: 1 }}>
+                                                    <Typography
+                                                        variant="caption"
+                                                        display="block"
+                                                        sx={{ mb: 0.5 }}
+                                                    >
+                                                        🕒️ {schedule.recipe?.cooking_time} minutes
+                                                    </Typography>
+                                                    <Typography
+                                                        variant="caption"
+                                                        display="block"
+                                                        sx={{ mb: 0.5 }}
+                                                    >
+                                                        👥 {schedule.recipe?.servings} minutes
+                                                    </Typography>
+                                                </Box>
+                                            }
+                                            arrow
+                                            enterDelay={500}
+                                            leaveDelay={200}
+                                        >
+                                            <Typography variant="body2" noWrap>
+                                                {schedule.recipe?.title}
+                                            </Typography>
+                                        </Tooltip>
                                     </Paper>
                                 ))}
-                            </Box>
+                            </Stack>
                         </Paper> 
-                    </Grid2>
-                ))}
-            </Grid2>
+                    ))}
+                </Stack>
+            </Box>
         </Box>
     );
 }

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy.exc import IntegrityError
 from typing import List
 from datetime import date
@@ -67,7 +67,9 @@ def get_schedule(
     """
     Get a specific schedule by ID
     """
-    schedule = db.query(schedule_model.Schedule).filter(
+    schedule = db.query(schedule_model.Schedule).options(
+        joinedload(schedule_model.Schedule.recipe)
+    ).filter(
         schedule_model.Schedule.id == schedule_id
     ).first()
 
@@ -92,7 +94,9 @@ def get_schedules_by_date_Range(
     Get all schedules within a date range (across all recipes)
     Primary endpoint for calendar view
     """
-    schedules = db.query(schedule_model.Schedule).filter(
+    schedules = db.query(schedule_model.Schedule).options(
+        joinedload(schedule_model.Schedule.recipe)
+    ).filter(
         schedule_model.Schedule.start_date <= end_date,
         schedule_model.Schedule.end_date >= start_date
     ).all()
