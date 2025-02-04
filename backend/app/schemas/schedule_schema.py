@@ -1,14 +1,21 @@
 from datetime import date
 from typing import Optional
+from enum import Enum
 from pydantic import BaseModel, ConfigDict, field_validator
 from app.schemas.recipe_schema import Recipe
+
+class MealType(str, Enum):
+    breakfast = 'breakfast'
+    lunch = 'lunch'
+    dinner = 'dinner'
+    snacks = 'snacks'
 
 # Schedule schemas
 
 class ScheduleBase(BaseModel):
     start_date: date
     end_date: date
-    meal_type: Optional[str] = None
+    meal_type: Optional[MealType] = None
     notes: Optional[str] = None
 
     @field_validator('end_date')
@@ -25,7 +32,7 @@ class ScheduleCreate(ScheduleBase):
 class ScheduleUpdate(BaseModel):
     start_date: Optional[date] = None
     end_date: Optional[date] = None
-    meal_type: Optional[str] = None
+    meal_type: Optional[MealType] = None
     notes: Optional[str] = None
 
     @field_validator('end_date')
