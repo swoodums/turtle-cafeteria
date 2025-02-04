@@ -8,10 +8,11 @@ import {
     Box,
     Typography,
     IconButton,
-    Grid2,
     Stack,
     Tooltip, 
-    Paper} from '@mui/material';
+    Paper,
+    Chip,
+    Grid2  } from '@mui/material';
 import {
     ChevronLeft,
     ChevronRight,
@@ -19,6 +20,33 @@ import {
 } from '@mui/icons-material'
 import scheduleService from '@/services/scheduleService';
 import { Schedule } from '@/types/schedules/schedule.types';
+
+const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snacks'] as const;
+
+const MEAL_TYPE_COLORS = {
+    breakfast: {
+        light: '#f7e2b4', // Light yellow
+        main: '#f4d793', // Yellow
+        text: '#000000'  // Black text for contrast
+    },
+    lunch: {
+        light: '#c5d1b9', // Light green
+        main: '#889e73', // Green
+        text: '#000000'  // Black text for contrast
+    },
+    dinner: {
+        light: '#dab3b3', // Light red
+        main: '#a94a4a', // Red
+        text: '#000000'  // Black text for contrast
+    },
+    snacks: {
+        light: 'd4c3e9',
+        main: '#9575cd',
+        text: '#ffffff'
+    }
+} as const;
+
+type MealType = keyof typeof MEAL_TYPE_COLORS
 
 export default function WeeklyCalendar() {
     const [ currentWeek, setCurrentWeek ] = useState(() => {
@@ -34,7 +62,7 @@ export default function WeeklyCalendar() {
     weekEnd.setDate(weekEnd.getDate() + 6);
 
     // Fetch schedules for current week
-    const { data: schedules, isLoading } = useQuery({
+    const { data: schedules } = useQuery({
         queryKey:['schedules', weekStart.toISOString(), weekEnd.toISOString()],
         queryFn: () => scheduleService.getSchedulesByDateRange(weekStart, weekEnd),
     });
@@ -56,19 +84,65 @@ export default function WeeklyCalendar() {
     });
 
     // Get schedules for a specific date
-    const getSchedulesForDate = (date: Date) => {
+    const getSchedulesForDate = (date: Date, mealType: string) => {
         if (!schedules) return [];
-        const dateStr = date.toISOString().split('T')[0];
-        return schedules.filter(schedule => {
-            const startDate = new Date(schedule.start_date);
-            const endDate = new Date(schedule.end_date);
-            const checkDate = new Date(date);
-            // Reset times to compare dates only
-            startDate.setHours(0, 0, 0, 0);
-            endDate.setHours(0, 0, 0, 0);
-            checkDate.setHours(0, 0, 0, 0);
-            return checkDate >= startDate && checkDate <= endDate;
-        });
+        const checkDateStr = date.toLocaleDateString('en-CA');
+        return schedules.filter(schedule =>
+            checkDateStr >= schedule.start_date &&
+            checkDateStr <= schedule.end_date &&
+            (schedule.meal_type?.toLowerCase() || 'dinner') === mealType.toLowerCase()
+        );
+    };
+
+    const getMealTypeColors = (mealType: string) => {
+        const type = (mealType?.toLowerCase() || 'dinner') as MealType;
+        return MEAL_TYPE_COLORS[type] || MEAL_TYPE_COLORS.dinner
+    };
+
+    const renderScheduleCard = (schedule: Schedule, mealType: string) => {
+        const colors = getMealTypeColors(mealType);
+        return (
+            <Tooltip
+                key={schedule.id}
+                title={
+                    <Box sx={{ p: 1 }}>
+                        <Typography variant="caption" display="block">
+                            🕒️ {schedule.recipe?.cooking_time} minutes
+                        </Typography>
+                        <Typography variant="caption" display="block">
+                            👥 Serves {schedule.recipe?.servings}
+                        </Typography>
+                        {schedule.notes && (
+                            <Typography variant="caption" display="block">
+                                📝 {schedule.notes}
+                            </Typography>
+                        )}
+                    </Box>
+                }
+            >
+                <Paper sx={{
+                    p: 1,
+                    backgroundColor: colors.light,
+                    curson: 'pointer',
+                    '&:hover': {
+                        backgroundColor:colors.main,
+                        '&: .MuiTypography-root': {
+                            color: colors.text
+                        }
+                    }
+                }}>
+                    <Typography
+                        variant="body2"
+                        noWrap
+                        sx={{
+                            fontSize: '0.875rem',
+                            textAlign: 'center'
+                        }}>
+                            {schedule.recipe?.title}
+                    </Typography>
+                </Paper>
+            </Tooltip>
+        );
     };
 
     return (
@@ -99,10 +173,10 @@ export default function WeeklyCalendar() {
                         <ChevronLeft />
                     </IconButton>
                     <Typography>
-                        {weekStart.toLocaleDateString('en-US', {
+                        {weekStart.toLocaleDateString('en-CA', {
                             month: 'long',
                             day: 'numeric'
-                        })} - {weekEnd.toLocaleDateString('en-US', {
+                        })} - {weekEnd.toLocaleDateString('en-CA', {
                             month: 'long',
                             day: 'numeric',
                             year: 'numeric'
@@ -113,98 +187,70 @@ export default function WeeklyCalendar() {
                     </IconButton>
                 </Box>
             </Box>
+        
+        {/* Meal Type Headers */}
+        <Grid2 container sx={{ px: 2, py: 1, borderBottom: 1, borderColor: 'divider' }}>
+            <Grid2 size={2}>
+                <Typography variant="subtitle2" sx={{ pl: 2 }}>Date</Typography>
+            </Grid2>
+            {MEAL_TYPES.map(mealType => (
+                <Grid2 size={2.5} key={mealType}>
+                    <Typography
+                        variant="subtitle2"
+                        sx={{
+                            textTransform: 'capitalize',
+                            textAlign: 'center'
+                        }}
+                    >
+                        {mealType}
+                    </Typography>
+                </Grid2>
+            ))}
+        </Grid2>
 
-            {/* Calendar Days - Vertical Stack */}
-            <Box sx={{
-                flexGrow: 1,
-                overflowY: 'auto',
-                px: 2,
-                pb: 2,
-                '::-webkit-scrollbar-track': {
-                    background: 'transparent',
-                },
-                '::-webkit-scrollbar-thumb': {
-                    background: 'rgba(0, 0, 0, 0.1)',
-                    borderRadius: '4px',
-                },
-            }}>
-                <Stack spacing={2}>
-                    {weekDates.map((date) => (
-                        <Paper
-                            key={date.toISOString()}
-                                sx={{
-                                p: 2,
-                                backgroundColor: 'background.default',
-                                width: '100%'
-                        }}>
-                            <Box sx={{
-                                display: 'flex',
-                                justifyContent: 'space-between',
-                                alignItems: 'center',
-                                mb: 2
-                            }}>
-                                <Typography variant="subtitle1">
-                                    {date.toLocaleDateString('en-US', {
+        {/* Calendar Body */}
+        <Box sx={{ flexGrow: 1, overflowY: 'auto', px: 2, pb: 2 }}>
+            <Stack spacing={1}>
+                {weekDates.map((date) => (
+                    <Paper
+                        key={date.toLocaleDateString('en-CA')}
+                        sx={{ p: 1 }}
+                    >
+                        <Grid2 container spacing={1} alignItems="center">
+                            {/* Date Column */}
+                            <Grid2 size={2}>
+                                <Typography variant="body2">
+                                    {date.toLocaleDateString('en-CA', {
                                         weekday: 'short',
                                         month: 'short',
                                         day: 'numeric'
                                     })}
                                 </Typography>
-                                <Tooltip title="Add Recipe">
-                                    <IconButton>
-                                        <AddIcon />
-                                    </IconButton>
-                                </Tooltip>
-                            </Box>
+                            </Grid2>
 
-                            {/* Scheduled Recipes */}
-                            <Stack spacing={1}>
-                                {getSchedulesForDate(date).map((schedule) => (
-                                    <Paper
-                                        key={schedule.id}
-                                        sx={{
-                                            p: 2,
-                                            backgroundColor: 'primary.light',
-                                            cursor: 'pointer',
-                                            '&:hover': {
-                                                backgroundColor: 'primary.main',
-                                            }
-                                        }}
-                                    >
-                                        <Tooltip
-                                            title={
-                                                <Box sx={{ p: 1 }}>
-                                                    <Typography
-                                                        variant="caption"
-                                                        display="block"
-                                                        sx={{ mb: 0.5 }}
-                                                    >
-                                                        🕒️ {schedule.recipe?.cooking_time} minutes
-                                                    </Typography>
-                                                    <Typography
-                                                        variant="caption"
-                                                        display="block"
-                                                        sx={{ mb: 0.5 }}
-                                                    >
-                                                        👥 {schedule.recipe?.servings} minutes
-                                                    </Typography>
-                                                </Box>
-                                            }
-                                            arrow
-                                            enterDelay={500}
-                                            leaveDelay={200}
-                                        >
-                                            <Typography variant="body2" noWrap>
-                                                {schedule.recipe?.title}
-                                            </Typography>
-                                        </Tooltip>
-                                    </Paper>
-                                ))}
-                            </Stack>
-                        </Paper> 
-                    ))}
-                </Stack>
-            </Box>
+                            {/* Meal Type Columns */}
+                            {MEAL_TYPES.map(mealType => (
+                                <Grid2 size={2.5} key={mealType}>
+                                    <Box sx={{
+                                        minHeight: '60px',
+                                        p: 1,
+                                        backgroundColor: 'background.default',
+                                        borderRadius: 1,
+                                        position: 'realtive'
+                                    }}>
+                                        <Stack spacing={1}>
+                                            {getSchedulesForDate(date, mealType).map(schedule =>
+                                                renderScheduleCard(schedule, mealType)
+                                            )}
+                                        </Stack>
+                                    </Box>
+                                </Grid2>
+                            ))}
+                        </Grid2>
+                    </Paper>
+                ))}
+            </Stack>
         </Box>
+    </Box>
     );
 }
