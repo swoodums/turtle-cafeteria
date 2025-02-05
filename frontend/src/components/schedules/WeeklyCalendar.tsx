@@ -49,6 +49,33 @@ const MEAL_TYPE_COLORS = {
     }
 } as const;
 
+const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snacks'] as const;
+
+const MEAL_TYPE_COLORS = {
+    breakfast: {
+        light: '#f7e2b4', // Light yellow
+        main: '#f4d793', // Yellow
+        text: '#000000'  // Black text for contrast
+    },
+    lunch: {
+        light: '#c5d1b9', // Light green
+        main: '#889e73', // Green
+        text: '#000000'  // Black text for contrast
+    },
+    dinner: {
+        light: '#dab3b3', // Light red
+        main: '#a94a4a', // Red
+        text: '#000000'  // Black text for contrast
+    },
+    snacks: {
+        light: 'd4c3e9',
+        main: '#9575cd',
+        text: '#ffffff'
+    }
+} as const;
+
+type MealType = keyof typeof MEAL_TYPE_COLORS
+
 export default function WeeklyCalendar() {
     const [ currentWeek, setCurrentWeek ] = useState(() => {
         const now = new Date();
@@ -188,7 +215,6 @@ export default function WeeklyCalendar() {
                                 <Grid2 size={2.5} key={mealType}>
                                     <Stack spacing={1}>
                                         <CalendarCell date={date} mealType={mealType}>
-                                        
                                             {getSchedulesForDate(date, mealType).map(schedule =>
                                                 <ScheduleCard
                                                     key={schedule.id}
@@ -199,7 +225,6 @@ export default function WeeklyCalendar() {
                                             )}
                                         </CalendarCell>
                                     </Stack>
-                                    
                                 </Grid2>
                             ))}
                         </Grid2>
