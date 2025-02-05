@@ -17,9 +17,37 @@ import {
     ChevronLeft,
     ChevronRight,
     Add as AddIcon,
+    Schedule as ScheduleIcon,
 } from '@mui/icons-material'
 import scheduleService from '@/services/scheduleService';
-import { Schedule } from '@/types/schedules/schedule.types';
+import { MealType, Schedule } from '@/types/schedules/schedule.types';
+import CalendarCell from './CalendarCell';
+import ScheduleCard from './ScheduleCard';
+
+const MEAL_TYPES:MealType[] = ['breakfast', 'lunch', 'dinner', 'snacks'];
+
+const MEAL_TYPE_COLORS = {
+    breakfast: {
+        light: '#f7e2b4', // Light yellow
+        main: '#f4d793', // Yellow
+        text: '#000000'  // Black text for contrast
+    },
+    lunch: {
+        light: '#c5d1b9', // Light green
+        main: '#889e73', // Green
+        text: '#000000'  // Black text for contrast
+    },
+    dinner: {
+        light: '#dab3b3', // Light red
+        main: '#a94a4a', // Red
+        text: '#000000'  // Black text for contrast
+    },
+    snacks: {
+        light: 'd4c3e9',
+        main: '#9575cd',
+        text: '#ffffff'
+    }
+} as const;
 
 const MEAL_TYPES = ['breakfast', 'lunch', 'dinner', 'snacks'] as const;
 
@@ -97,52 +125,6 @@ export default function WeeklyCalendar() {
     const getMealTypeColors = (mealType: string) => {
         const type = (mealType?.toLowerCase() || 'dinner') as MealType;
         return MEAL_TYPE_COLORS[type] || MEAL_TYPE_COLORS.dinner
-    };
-
-    const renderScheduleCard = (schedule: Schedule, mealType: string) => {
-        const colors = getMealTypeColors(mealType);
-        return (
-            <Tooltip
-                key={schedule.id}
-                title={
-                    <Box sx={{ p: 1 }}>
-                        <Typography variant="caption" display="block">
-                            🕒️ {schedule.recipe?.cooking_time} minutes
-                        </Typography>
-                        <Typography variant="caption" display="block">
-                            👥 Serves {schedule.recipe?.servings}
-                        </Typography>
-                        {schedule.notes && (
-                            <Typography variant="caption" display="block">
-                                📝 {schedule.notes}
-                            </Typography>
-                        )}
-                    </Box>
-                }
-            >
-                <Paper sx={{
-                    p: 1,
-                    backgroundColor: colors.light,
-                    curson: 'pointer',
-                    '&:hover': {
-                        backgroundColor:colors.main,
-                        '&: .MuiTypography-root': {
-                            color: colors.text
-                        }
-                    }
-                }}>
-                    <Typography
-                        variant="body2"
-                        noWrap
-                        sx={{
-                            fontSize: '0.875rem',
-                            textAlign: 'center'
-                        }}>
-                            {schedule.recipe?.title}
-                    </Typography>
-                </Paper>
-            </Tooltip>
-        );
     };
 
     return (
@@ -231,19 +213,18 @@ export default function WeeklyCalendar() {
                             {/* Meal Type Columns */}
                             {MEAL_TYPES.map(mealType => (
                                 <Grid2 size={2.5} key={mealType}>
-                                    <Box sx={{
-                                        minHeight: '60px',
-                                        p: 1,
-                                        backgroundColor: 'background.default',
-                                        borderRadius: 1,
-                                        position: 'realtive'
-                                    }}>
-                                        <Stack spacing={1}>
+                                    <Stack spacing={1}>
+                                        <CalendarCell date={date} mealType={mealType}>
                                             {getSchedulesForDate(date, mealType).map(schedule =>
-                                                renderScheduleCard(schedule, mealType)
+                                                <ScheduleCard
+                                                    key={schedule.id}
+                                                    schedule={schedule}
+                                                    mealType={mealType}
+                                                    colors={getMealTypeColors(mealType)}
+                                                />
                                             )}
-                                        </Stack>
-                                    </Box>
+                                        </CalendarCell>
+                                    </Stack>
                                 </Grid2>
                             ))}
                         </Grid2>
