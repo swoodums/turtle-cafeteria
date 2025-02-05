@@ -10,16 +10,21 @@ import {
     Accordion,
     AccordionSummary,
     AccordionDetails,
-    Paper,
     CircularProgress } from '@mui/material';
 import { ExpandMore, AccessTime, People } from '@mui/icons-material';
 import recipeService from '@/services/recipeService';
+import { Recipe } from '@/types/recipes/recipe.types'
 
 export default function AccordionRecipeList() {
     const { data: recipes, isLoading } = useQuery({
         queryKey: ['recipes'],
         queryFn: recipeService.getAllRecipes,
     });
+
+    const handleDragStart = (e: React.DragEvent, recipe: Recipe) => {
+        e.dataTransfer.setData('application/json', JSON.stringify(recipe));
+        e.dataTransfer.effectAllowed = 'copy';
+    };
 
     if (isLoading) {
         return (
@@ -59,11 +64,17 @@ export default function AccordionRecipeList() {
                     {recipes?.map((recipe) => (
                         <Accordion
                             key={recipe.id}
+                            draggable
+                            onDragStart={(e) => handleDragStart(e, recipe)}
                             sx={{
                                 '&:before': {
                                     display: 'none' // Removes the default divider
                                 },
                                 boxShadow: 1,
+                                cursor: 'grab',
+                                '&:active': {
+                                    cursor: 'grabbing'
+                                }
                             }}
                         >
                             <AccordionSummary

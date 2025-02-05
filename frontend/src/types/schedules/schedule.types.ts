@@ -16,6 +16,7 @@ export interface Schedule {
 
 // Type for creating a new schedule
 export interface ScheduleCreate {
+    recipe_id: number;
     start_date: string;
     end_date: string;
     meal_type?: MealType;
