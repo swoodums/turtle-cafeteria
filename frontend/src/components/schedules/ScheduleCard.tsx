@@ -5,17 +5,21 @@ import {
     Paper,
     Typography,
     IconButton,
+    MenuItem,
+    Box,
+    Tooltip,
+    Popover,
     Dialog,
     DialogTitle,
     DialogContent,
     DialogActions,
-    Button,
-    Box,
-    Tooltip } from '@mui/material';
-import { Close as CloseIcon } from '@mui/icons-material';
+    Button} from '@mui/material';
+import { MoreVert as MoreVertIcon } from '@mui/icons-material';
 import { MealType, Schedule } from '@/types/schedules/schedule.types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import scheduleService from '@/services/scheduleService';
+import EditScheduleModal from './EditScheduleModal';
 
 interface ScheduleCardProps {
     schedule: Schedule;
@@ -28,24 +32,46 @@ interface ScheduleCardProps {
 }
 
 export default function ScheduleCard({ schedule, mealType, colors }: ScheduleCardProps) {
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
     const queryClient = useQueryClient();
+    const router = useRouter();
+
+    const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+        event.stopPropagation();
+        setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+        setAnchorEl(null);
+    };
 
     const deleteMutation = useMutation({
-        mutationFn: (scheduleId: number) => scheduleService.deleteSchedule(scheduleId),
+        mutationFn: () => scheduleService.deleteSchedule(schedule.id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['schedules'] });
+            handleMenuClose();
         },
     });
 
-    const handleDeleteClick = (e: React.MouseEvent) => {
-        e.stopPropagation(); // Prevent event from bubbling to parent elements
+    const handleDelete = () => {
         setDeleteDialogOpen(true);
+        handleMenuClose;
     };
 
     const handleConfirmDelete = () => {
-        deleteMutation.mutate(schedule.id);
+        deleteMutation.mutate();
         setDeleteDialogOpen(false);
+    };
+
+    const handleViewRecipe = () => {
+        router.push(`/recipes/${schedule.recipe_id}`);
+    };
+
+    const handleEdit = () => {
+        setIsEditModalOpen(true);
+        handleMenuClose();
     };
 
     return (
@@ -99,7 +125,7 @@ export default function ScheduleCard({ schedule, mealType, colors }: ScheduleCar
                         </Typography>
                         <IconButton
                             size="small"
-                            onClick={handleDeleteClick}
+                            onClick={handleMenuClick}
                             sx={{
                                 padding: '2px',
                                 '&:hover': {
@@ -107,11 +133,37 @@ export default function ScheduleCard({ schedule, mealType, colors }: ScheduleCar
                                 }
                             }}
                         >
-                            <CloseIcon fontSize="small" />
+                            <MoreVertIcon fontSize="small" />
                         </IconButton>
                     </Box>
                 </Paper>
             </Tooltip>
+
+            {/* Menu Popover */}
+            <Popover
+                open={Boolean(anchorEl)}
+                anchorEl={anchorEl}
+                onClose={handleMenuClose}
+                anchorOrigin={{
+                    vertical: 'bottom',
+                    horizontal: 'right',
+                }}
+                transformOrigin={{
+                    vertical: 'top',
+                    horizontal: 'right',
+                }}
+            >
+                <MenuItem onClick={handleViewRecipe}>View Recipe</MenuItem>
+                <MenuItem onClick={handleEdit}>Edit Schedule</MenuItem>
+                <MenuItem onClick={handleDelete}>Delete Schedule</MenuItem>
+            </Popover>
+
+            {/* Edit Modal */}
+            <EditScheduleModal
+                schedule={schedule}
+                open={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+            />
 
             {/* Delete Confirmation Dialog */}
             <Dialog
@@ -127,14 +179,14 @@ export default function ScheduleCard({ schedule, mealType, colors }: ScheduleCar
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setDeleteDialogOpen(false)}>
-                        Cancel
+                        Whoa, there!
                     </Button>
-                    <Button 
-                        onClick={handleConfirmDelete} 
-                        color="error" 
+                    <Button
+                        onClick={handleConfirmDelete}
+                        color="error"
                         variant="contained"
                     >
-                        Remove
+                        Giddyup
                     </Button>
                 </DialogActions>
             </Dialog>
