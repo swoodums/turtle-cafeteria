@@ -114,11 +114,12 @@ export default function ScheduleCard({ schedule, mealType, colors }: ScheduleCar
                     }}>
                         <Typography
                             variant="body2"
-                            noWrap
                             sx={{
+                                overflow: 'hidden',
+                                textOverflow: 'ellipsis',
+                                whiteSapce: 'nowrap',
+                                flexGrow: 1,
                                 fontSize: '0.875rem',
-                                flex: 1,
-                                mr: 1
                             }}
                         >
                             {schedule.recipe?.title}
