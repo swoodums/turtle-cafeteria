@@ -3,20 +3,20 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import {
     Box,
     Typography,
     IconButton,
     Stack,
-    Paper,
-    Grid2  } from '@mui/material';
+    Paper } from '@mui/material';
 import {
     ChevronLeft,
     ChevronRight,
-} from '@mui/icons-material'
+} from '@mui/icons-material';
+import { DropResult } from '@hello-pangea/dnd';
 import scheduleService from '@/services/scheduleService';
-import { MealType, Schedule } from '@/types/schedules/schedule.types';
+import { MealType, ScheduleCreate } from '@/types/schedules/schedule.types';
 import CalendarCell from './CalendarCell';
 import ScheduleCard from './ScheduleCard';
 
@@ -72,6 +72,41 @@ export default function WeeklyCalendar() {
             return newDate;
         });
     };
+
+    const queryClient = useQueryClient();
+    const createScheduleMutation = useMutation({
+        mutationFn: (newSchedule: ScheduleCreate) =>
+            scheduleService.createSchedule(newSchedule.recipe_id, newSchedule),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['schedules'] });
+        },
+    });
+
+    {/* Define how to drop recipes on calendar */}
+    const handleDragEnd = (result: DropResult) => {
+        const { destination, source, draggableId } = result;
+
+        // Drop was cancelled or occurred outside valid drop target
+        if (!destination) return;
+
+        // Extract recipe ID from draggableId
+        const recipeId = parseInt(draggableId.split('-')[1]);
+        if (isNaN(recipeId)) return;
+
+        //Extract date and meal type from destination droppableId
+        const [dateStr, mealType] = destination.droppableId.split('-');
+        const date = new Date(dateStr);
+
+        //Create the schedule
+        const scheduleData: ScheduleCreate = {
+            recipe_id: recipeId,
+            start_date: date.toLocaleDateString('en-CA'),
+            end_date: date.toLocaleDateString('en-CA'),
+            meal_type: mealType as MealType,
+        };
+
+        createScheduleMutation.mutate(scheduleData);
+    }
 
     // Generate array of dates for current week
     const weekDates = [...Array(7)].map((_, i) => {
@@ -156,7 +191,7 @@ export default function WeeklyCalendar() {
                     {/* Day Headers */}
                     {weekDates.map((date) => (
                         <Paper
-                        key={date.toISOString()}
+                        key={date.toLocaleDateString('en-CA')}
                         sx={{ 
                             mb: 1,
                             textAlign: 'center',
@@ -176,10 +211,10 @@ export default function WeeklyCalendar() {
 
                     {/* Calendar Cells */}
                     {weekDates.map((date) => (
-                        <Stack key={`cell-${date.toISOString()}`} spacing={1}>
+                        <Stack key={`cell-${date.toLocaleDateString('en-CA')}`} spacing={1}>
                             {MEAL_TYPES.map((mealType) => (
                                 <Paper 
-                                    key={`${date.toISOString()}-${mealType}`}
+                                    key={`${date.toLocaleDateString('en-CA')}-${mealType}`}
                                     sx={{ 
                                         minHeight: '120px',
                                         display: 'flex',

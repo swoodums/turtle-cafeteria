@@ -5,39 +5,64 @@
 import WeeklyCalendar from "@/components/schedules/WeeklyCalendar";
 import AccordionRecipeList from "@/components/schedules/AccordionRecipeList"
 import { Box } from '@mui/material'
+import { DragDropContext, DropResult } from '@hello-pangea/dnd';
 
 export default function SchedulePage() {
-    return (
-        <Box sx={{
-            display: 'flex',
-            gap: 3,
-            height: 'calc(100vh - 80px)', // Full viewport height minus AppBar height
-            width: '100%',
-            overflow: 'hidden',
-            p: 3
-        }}>
-            {/* Calendar */}
-            <Box sx={{
-                flexGrow: 1,
-                height: '100%',
-                overflow: 'hidden',
-                bgcolor: 'background.paper',
-                borderRadius: 1
-            }}>
-                <WeeklyCalendar />
-            </Box>
+    const handleDragEnd = (result: DropResult) => {
+        const { destination, source, draggableId } = result;
 
-            {/* Recipes */}
+        // Drop was cancelled or occurred outside valid drop target
+        if (!destination) return;
+
+        // Extract recipe ID from draggableId
+        const recipeId = parseInt(draggableId.split('-')[1]);
+        if (isNaN(recipeId)) return;
+
+        //Extract date and meal type from destination droppableId
+        const [dateStr, mealType] = destination.droppableId.split('-');
+        const date = new Date(dateStr);
+
+        // Log the drag operation (for debugging)
+        console.log('Drag completed:', {
+            recipeId,
+            date: date.toISOString(),
+            mealType
+        });
+    };
+
+    return (
+        <DragDropContext onDragEnd={handleDragEnd}>
             <Box sx={{
-                width: '400px',
-                flexShrink: 0, // Prevent width from shrinking
-                height: '100%',
+                display: 'flex',
+                gap: 3,
+                height: 'calc(100vh - 80px)', // Full viewport height minus AppBar height
+                width: '100%',
                 overflow: 'hidden',
-                bgcolor: 'background.paper',
-                borderRadius: 1
+                p: 3
             }}>
-                <AccordionRecipeList />
+                {/* Calendar */}
+                <Box sx={{
+                    flexGrow: 1,
+                    height: '100%',
+                    overflowY: 'hidden',
+                    bgcolor: 'background.paper',
+                    borderRadius: 1
+                }}>
+                    <WeeklyCalendar />
+                </Box>
+
+                {/* Recipes */}
+                <Box sx={{
+                    width: '400px',
+                    flexShrink: 0, // Prevent width from shrinking
+                    height: '100%',
+                    overflow: 'hidden',
+                    bgcolor: 'background.paper',
+                    borderRadius: 1
+                }}>
+                    <AccordionRecipeList />
+                </Box>
             </Box>
-        </Box>
+        </DragDropContext>
     );
 }
