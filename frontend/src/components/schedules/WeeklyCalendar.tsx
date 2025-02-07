@@ -9,15 +9,11 @@ import {
     Typography,
     IconButton,
     Stack,
-    Tooltip, 
     Paper,
-    Chip,
     Grid2  } from '@mui/material';
 import {
     ChevronLeft,
     ChevronRight,
-    Add as AddIcon,
-    Schedule as ScheduleIcon,
 } from '@mui/icons-material'
 import scheduleService from '@/services/scheduleService';
 import { MealType, Schedule } from '@/types/schedules/schedule.types';
@@ -43,9 +39,9 @@ const MEAL_TYPE_COLORS = {
         text: '#000000'  // Black text for contrast
     },
     snacks: {
-        light: '#d4c3e9',
-        main: '#9575cd',
-        text: '#ffffff'
+        light: '#d4c3e9',  // Light purple
+        main: '#9575cd', // Purple
+        text: '#ffffff' // White text for contrast
     }
 } as const;
 
@@ -102,19 +98,19 @@ export default function WeeklyCalendar() {
 
     return (
         <Box sx={{
+            height: '100%',
             display: 'flex',
             flexDirection: 'column',
-            height: '100%',
-            width: '100%',
+            maxWidth: '100%'
         }}>
-            {/* Fixed Calendar Header */}
+            {/* Calendar Header */}
             <Box sx={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
                 p: 2,
                 borderBottom: 1,
-                borderColor: 'divider'
+                borderColor: 'divider',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center'
             }}>
                 <Typography variant="h4">
                     Recipe Schedule
@@ -128,10 +124,10 @@ export default function WeeklyCalendar() {
                         <ChevronLeft />
                     </IconButton>
                     <Typography>
-                        {weekStart.toLocaleDateString('en-CA', {
+                        {weekStart.toLocaleDateString('en-US', {
                             month: 'long',
                             day: 'numeric'
-                        })} - {weekEnd.toLocaleDateString('en-CA', {
+                        })} - {weekEnd.toLocaleDateString('en-US', {
                             month: 'long',
                             day: 'numeric',
                             year: 'numeric'
@@ -142,71 +138,83 @@ export default function WeeklyCalendar() {
                     </IconButton>
                 </Box>
             </Box>
-        
-        {/* Meal Type Headers */}
-        <Grid2 container sx={{ px: 2, py: 1, borderBottom: 1, borderColor: 'divider' }}>
-            <Grid2 size={2}>
-                <Typography variant="subtitle2" sx={{ pl: 2 }}>Date</Typography>
-            </Grid2>
-            {MEAL_TYPES.map(mealType => (
-                <Grid2 size={2.5} key={mealType}>
-                    <Typography
-                        variant="subtitle2"
-                        sx={{
-                            textTransform: 'capitalize',
-                            textAlign: 'center'
-                        }}
-                    >
-                        {mealType}
-                    </Typography>
-                </Grid2>
-            ))}
-        </Grid2>
 
-        {/* Calendar Body */}
-        <Box sx={{ flexGrow: 1, overflowY: 'auto', px: 2, pb: 2 }}>
-            <Stack spacing={1}>
-                {weekDates.map((date) => (
-                    <Paper
-                        key={date.toLocaleDateString('en-CA')}
-                        sx={{ p: 1 }}
-                    >
-                        <Grid2 container spacing={1} alignItems="center">
-                            {/* Date Column */}
-                            <Grid2 size={2}>
-                                <Typography variant="body2">
-                                    {date.toLocaleDateString('en-CA', {
-                                        weekday: 'short',
-                                        month: 'short',
-                                        day: 'numeric'
-                                    })}
-                                </Typography>
-                            </Grid2>
+            {/* Calendar Grid */}
+            <Box sx={{ 
+                flexGrow: 1, 
+                overflow: 'auto', 
+                p: 2,
+                minHeight: 0
+            }}>
+                <Box sx={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(7, 1fr)',
+                    gap: 1,
+                    width: '100%',
+                    height: '80%'
+                }}>
+                    {/* Day Headers */}
+                    {weekDates.map((date) => (
+                        <Paper
+                        key={date.toISOString()}
+                        sx={{ 
+                            mb: 1,
+                            textAlign: 'center',
+                            backgroundColor: 'primary.light',
+                            color: 'primary.contrastText',
+                            width: '100%'
+                            }}
+                        >
+                            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+                                {date.toLocaleDateString('en-US', { weekday: 'short' })}
+                            </Typography>
+                            <Typography variant="subtitle1">
+                                {date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                            </Typography>
+                        </Paper>
+                    ))}
 
-                            {/* Meal Type Columns */}
-                            {MEAL_TYPES.map(mealType => (
-                                <Grid2 size={2.5} key={mealType}>
-                                    <Stack spacing={1}>
-                                        <CalendarCell date={date} mealType={mealType}>
-                                        
-                                            {getSchedulesForDate(date, mealType).map(schedule =>
+                    {/* Calendar Cells */}
+                    {weekDates.map((date) => (
+                        <Stack key={`cell-${date.toISOString()}`} spacing={1}>
+                            {MEAL_TYPES.map((mealType) => (
+                                <Paper 
+                                    key={`${date.toISOString()}-${mealType}`}
+                                    sx={{ 
+                                        minHeight: '120px',
+                                        display: 'flex',
+                                        flexDirection: 'column'
+                                    }}
+                                >
+                                    <Typography 
+                                        variant="subtitle2" 
+                                        sx={{ 
+                                            mb: 1,
+                                            textTransform: 'capitalize',
+                                            color: 'text.secondary',
+                                            fontWeight: 'bold'
+                                        }}
+                                    >
+                                        {mealType}
+                                    </Typography>
+                                    <CalendarCell date={date} mealType={mealType}>
+                                        <Stack spacing={1}>
+                                            {getSchedulesForDate(date, mealType).map(schedule => (
                                                 <ScheduleCard
                                                     key={schedule.id}
                                                     schedule={schedule}
                                                     mealType={mealType}
                                                     colors={getMealTypeColors(mealType)}
                                                 />
-                                            )}
-                                        </CalendarCell>
-                                    </Stack>
-                                    
-                                </Grid2>
+                                            ))}
+                                        </Stack>
+                                    </CalendarCell>
+                                </Paper>
                             ))}
-                        </Grid2>
-                    </Paper>
-                ))}
-            </Stack>
+                        </Stack>
+                    ))}
+                </Box>
+            </Box>
         </Box>
-    </Box>
     );
 }
