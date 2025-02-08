@@ -1,42 +1,58 @@
 /* frontend/sr/components/schedule/CalendarCell.tsx */
 
-import React from 'react';
-import { Box, Paper } from '@mui/material';
-import { Droppable, DroppableProvided, DroppableStateSnapshot } from '@hello-pangea/dnd';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { Box } from '@mui/material';
 import { Recipe } from '@/types/recipes/recipe.types';
-import scheduleService from '@/services/scheduleService';
-import { MealType, Schedule, ScheduleCreate } from '@/types/schedules/schedule.types';
+import { MealType } from '@/types/schedules/schedule.types';
 
 interface CalendarCellProps {
     date: Date;
     mealType: MealType;
+    onDrop: (recipe: Recipe, date: Date, mealType: MealType) => void;
     children?: React.ReactNode;
 }
 
-export default function CalendarCell({ date, mealType, children }: CalendarCellProps) {
-    const droppableId = `${date.toLocaleDateString('en-CA')}-${mealType}`
+export default function CalendarCell({ date, mealType, onDrop, children }: CalendarCellProps) {
+    const [isOver, setIsOver] = useState(false);
+
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        if (!isOver) {
+            setIsOver(true);
+        }
+    };
+
+    const handleDragLeave = () => {
+        setIsOver(false);
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        setIsOver(false);
+
+        try {
+            const recipeData = e.dataTransfer.getData('application/json');
+            const recipe = JSON.parse(recipeData) as Recipe;
+            onDrop(recipe, date, mealType);
+        } catch (error) {
+            console.error('Error processing dropped recipe: ', error);
+        }
+    };
 
     return (
-        <Droppable droppableId={droppableId}>
-            {(provided: DroppableProvided, snapshot: DroppableStateSnapshot) => (
-                <Box
-                    ref={provided.innerRef}
-                    {...provided.droppableProps}
-                    sx={{
-                        minHeight: '60px',
-                        height: '100%',
-                        backgroundColor: snapshot.isDraggingOver 
-                            ? 'action.hover' 
-                            : 'background.default',
-                        borderRadius: 1,
-                        transition: 'background-color 0.2s ease'
-                    }}
-                >
-                    {children}
-                    {provided.placeholder}
-            </Box>
-            )}
-        </Droppable>
+        <Box
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            sx={{
+                minHeight: '60px',
+                height: '100%',
+                backgroundColor: isOver ? 'action.hover' : 'background.default',
+                borderRadius: 1,
+                transition: 'background-color 0.2s ease'
+            }}
+        >
+            {children}
+        </Box>
     );
 }

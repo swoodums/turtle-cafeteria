@@ -1,7 +1,7 @@
 import { Recipe } from '../recipes/recipe.types';
 
 // Define the meal type enum
-export type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snacks'
+export type MealType = 'breakfast' | 'lunch' | 'dinner'
 
 // Base schedule type that matches our backend model
 export interface Schedule {

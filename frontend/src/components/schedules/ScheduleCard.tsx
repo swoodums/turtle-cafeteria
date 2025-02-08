@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import {
     Paper,
     Typography,
-    IconButton,
     MenuItem,
     Box,
     Tooltip,
@@ -13,8 +12,8 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-    Button} from '@mui/material';
-import { MoreVert as MoreVertIcon } from '@mui/icons-material';
+    Button,
+    ButtonBase } from '@mui/material';
 import { MealType, Schedule } from '@/types/schedules/schedule.types';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
@@ -38,12 +37,11 @@ export default function ScheduleCard({ schedule, mealType, colors }: ScheduleCar
     const queryClient = useQueryClient();
     const router = useRouter();
 
-    const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
-        event.stopPropagation();
+    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorEl(event.currentTarget);
     };
 
-    const handleMenuClose = () => {
+    const handleClose = () => {
         setAnchorEl(null);
     };
 
@@ -51,13 +49,13 @@ export default function ScheduleCard({ schedule, mealType, colors }: ScheduleCar
         mutationFn: () => scheduleService.deleteSchedule(schedule.id),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: ['schedules'] });
-            handleMenuClose();
+            handleClose();
         },
     });
 
     const handleDelete = () => {
         setDeleteDialogOpen(true);
-        handleMenuClose;
+        handleClose;
     };
 
     const handleConfirmDelete = () => {
@@ -71,14 +69,17 @@ export default function ScheduleCard({ schedule, mealType, colors }: ScheduleCar
 
     const handleEdit = () => {
         setIsEditModalOpen(true);
-        handleMenuClose();
+        handleClose();
     };
 
     return (
         <>
             <Tooltip
                 title={
-                    <Box sx={{ p:1 }}>
+                    <Box sx={{ p:1, display: 'block' }}>
+                        <Typography variant="subtitle1" display="block">
+                        {schedule.recipe?.title}
+                        </Typography>
                         <Typography variant="caption" display="block">
                         🕒 {schedule.recipe?.cooking_time} minutes
                         </Typography>
@@ -93,58 +94,54 @@ export default function ScheduleCard({ schedule, mealType, colors }: ScheduleCar
                     </Box>
                 }
             >
-                <Paper
+                <ButtonBase
+                    onClick={handleClick}
                     sx={{
-                        p: 1,
-                        backgroundColor: colors.light,
-                        cursor: 'pointer',
-                        position: 'relative',
-                        '&:hover': {
-                            backgroundColor: colors.main,
-                            '& .MuiTypography-root': {
-                                color: colors.text
-                            }
-                        }
+                        width: '100%',
+                        display:'block',
+                        textAlign: 'left'
                     }}
                 >
-                    <Box sx={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center'
-                    }}>
-                        <Typography
-                            variant="body2"
-                            sx={{
-                                overflow: 'hidden',
-                                textOverflow: 'ellipsis',
-                                whiteSapce: 'nowrap',
-                                flexGrow: 1,
-                                fontSize: '0.875rem',
-                            }}
-                        >
-                            {schedule.recipe?.title}
-                        </Typography>
-                        <IconButton
-                            size="small"
-                            onClick={handleMenuClick}
-                            sx={{
-                                padding: '2px',
-                                '&:hover': {
-                                    backgroundColor: 'rgba(0, 0, 0, 0.1)'
+                    <Paper
+                        sx={{
+                            p: 1,
+                            backgroundColor: colors.light,
+                            cursor: 'pointer',
+                            position: 'relative',
+                            '&:hover': {
+                                backgroundColor: colors.main,
+                                '& .MuiTypography-root': {
+                                    color: colors.text
                                 }
-                            }}
-                        >
-                            <MoreVertIcon fontSize="small" />
-                        </IconButton>
-                    </Box>
-                </Paper>
+                            }
+                        }}
+                    >
+                        <Box sx={{
+                            overflow: 'hidden',
+                            flexGrow: 1,
+                            width: '100%'
+                        }}>
+                            <Typography
+                                variant="body2"
+                                sx={{
+                                    overflow: 'hidden',
+                                    textOverflow: 'ellipsis',
+                                    fontSize: '0.875rem',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                {schedule.recipe?.title}
+                            </Typography>
+                        </Box>
+                    </Paper>
+                </ButtonBase>
             </Tooltip>
 
             {/* Menu Popover */}
             <Popover
                 open={Boolean(anchorEl)}
                 anchorEl={anchorEl}
-                onClose={handleMenuClose}
+                onClose={handleClose}
                 anchorOrigin={{
                     vertical: 'bottom',
                     horizontal: 'right',
