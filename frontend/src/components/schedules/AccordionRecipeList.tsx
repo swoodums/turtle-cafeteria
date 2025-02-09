@@ -21,11 +21,6 @@ export default function AccordionRecipeList() {
         queryFn: recipeService.getAllRecipes,
     });
 
-    const handleDragStart = (e: React.DragEvent, recipe: Recipe) => {
-        e.dataTransfer.setData('application/json', JSON.stringify(recipe));
-        e.dataTransfer.effectAllowed = 'copy';
-    };
-
     if (isLoading) {
         return (
             <Box sx={{ display: 'flex', justifyContent: 'center', p: 4 }}>
@@ -34,101 +29,93 @@ export default function AccordionRecipeList() {
         );
     }
 
+    const handleDragStart = (e: React.DragEvent<HTMLDivElement>, recipe: Recipe) => {
+        e.dataTransfer.setData('application/json', JSON.stringify(recipe));
+        // Dragging class to style the dragged element.  Drag 'em!
+        if (e.currentTarget.classList) {
+            e.currentTarget.classList.add('dragging');
+        }
+    };
+
+    const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+        // Remove the dragging class
+        if (e.currentTarget.classList) {
+            e.currentTarget.classList.remove('dragging');
+        }
+    };
+
     return (
         <Box sx={{
             display: 'flex',
             flexDirection: 'column',
             height: '100%',
         }}>
-            <Typography
-                variant="h6"
-                sx={{
-                    p: 2,
-                    bgcolor: 'background.paper'
-            }}>
+            <Typography variant="h6" sx={{ p: 2, bgcolor: 'background.paper' }}>
                 Available Recipes
             </Typography>
-            
-            {/* Scrollable Recipe list */}
+
             <Box sx={{
                 flexGrow: 1,
                 overflowY: 'auto',
                 px: 2,
-                pb: 2,
+                pb: 2
             }}>
-                <Box sx={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 1
-                }}>
-                    {recipes?.map((recipe) => (
-                        <Accordion
-                            key={recipe.id}
-                            draggable
-                            onDragStart={(e) => handleDragStart(e, recipe)}
-                            sx={{
-                                '&:before': {
-                                    display: 'none' // Removes the default divider
-                                },
-                                boxShadow: 1,
-                                cursor: 'grab',
-                                '&:active': {
-                                    cursor: 'grabbing'
-                                }
-                            }}
-                        >
-                            <AccordionSummary
-                                expandIcon={<ExpandMore />}
-                                sx={{
-                                    '&hover': {
-                                        backgroundColor: 'action.hover',
-                                    },
-                                }}
-                            >
-                                <Typography>{recipe.title}</Typography>
-                            </AccordionSummary>
-                            <AccordionDetails>
+                {recipes?.map((recipe) => (
+                    <Accordion
+                        key={recipe.id}
+                        draggable
+                        onDragStart={(e) => handleDragStart(e, recipe)}
+                        onDragEnd={handleDragEnd}
+                        sx={{
+                            mb: 1,
+                            '&:before': {
+                                display: 'none'
+                            },
+                            boxShadow: 1,
+                            cursor: 'grab',
+                            '&:active': {
+                                cursor: 'grabbing'
+                            },
+                            '&.dragging': {
+                                opacity: 0.8,
+                                boxShadow: 3
+                            }
+                        }}
+                    >
+                        <AccordionSummary expandIcon={<ExpandMore />}>
+                            <Typography>{recipe.title}</Typography>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                            <Box sx={{
+                                display: 'flex',
+                                gap: 1,
+                                mt: 1,
+                                color: 'text.secondary'
+                            }}>
                                 <Box sx={{
                                     display: 'flex',
-                                    flexDirection: 'column',
-                                    gap: 1
+                                    alignItems: 'center',
+                                    gap: 0.5
                                 }}>
-                                    <Typography variant="body2" color="text.secondary">
-                                        {recipe.description}
+                                    <AccessTime fontSize="small" />
+                                    <Typography variant="body2">
+                                        {recipe.cooking_time} mins
                                     </Typography>
-
-                                    <Box sx={{
-                                        display: 'flex',
-                                        gap: 2,
-                                        mt: 1,
-                                        collor: 'text.secondary'
-                                    }}>
-                                        <Box sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 0.5
-                                        }}>
-                                            <AccessTime fontSize="small" />
-                                            <Typography variant="body2">
-                                                {recipe.cooking_time} mins
-                                            </Typography>
-                                        </Box>
-                                        <Box sx={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: 0.5
-                                        }}>
-                                            <People/>
-                                            <Typography variant="body2">
-                                                Serves {recipe.servings}
-                                            </Typography>
-                                        </Box>
-                                    </Box>
                                 </Box>
-                            </AccordionDetails>
-                        </Accordion>
-                    ))}
-                </Box>
+                                <Box sx={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: 0.5
+                                }}>
+                                    <People fontSize="small" />
+                                    <Typography variant="body2">
+                                        Serves {recipe.servings}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </AccordionDetails>
+                    </Accordion>
+                ))}
             </Box>
         </Box>
     );

@@ -1,75 +1,65 @@
 /* frontend/sr/components/schedule/CalendarCell.tsx */
 
-import React from 'react';
-import { Box, Paper } from '@mui/material';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import React, { useState } from 'react';
+import { Box } from '@mui/material';
 import { Recipe } from '@/types/recipes/recipe.types';
-import scheduleService from '@/services/scheduleService';
-import { MealType, Schedule, ScheduleCreate } from '@/types/schedules/schedule.types';
+import { Schedule, MealType } from '@/types/schedules/schedule.types';
 
 interface CalendarCellProps {
     date: Date;
     mealType: MealType;
+    onDrop: (recipe: Recipe | Schedule, isNewSchedule: boolean, date: Date, mealType: MealType) => void;
     children?: React.ReactNode;
 }
 
-export default function CalendarCell({ date, mealType, children }: CalendarCellProps) {
-    const queryClient = useQueryClient();
+export default function CalendarCell({
+    date,
+    mealType,
+    onDrop,
+    children
+}: CalendarCellProps) {
+    const [isOver, setIsOver] = useState(false);
 
-    const createScheduleMutation = useMutation({
-        mutationFn: (newSchedule: ScheduleCreate) =>
-            scheduleService.createSchedule(newSchedule.recipe_id, newSchedule),
-        onSuccess: () => {
-            // invalidate and refetch
-            queryClient.invalidateQueries({ queryKey: ['schedules'] });
-        },
-    });
-
-    const handleDragOver = (e: React.DragEvent) => {
+    const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
-        e.dataTransfer.dropEffect = 'copy';
+        if (!isOver) {
+            setIsOver(true);
+        }
     };
 
-    const handleDrop = async (e: React.DragEvent) => {
+    const handleDragLeave = () => {
+        setIsOver(false);
+    };
+
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
+        setIsOver(false);
 
         try {
-            const recipeData = e.dataTransfer.getData('application/json');
-            const recipe: Recipe = JSON.parse(recipeData);
+            const data = JSON.parse(e.dataTransfer.getData('application/json'));
+            const isNewSchedule = !data.type || data.type !== 'schedule';
 
-            const formattedDate = new Date(
-                date.getFullYear(),
-                date.getMonth(),
-                date.getDate()
-            ).toLocaleDateString('en-CA');
-
-            // Create a new schedule for the dropped recipe
-            const scheduleData: ScheduleCreate = {
-                recipe_id: recipe.id,
-                start_date: formattedDate,
-                end_date: formattedDate,
-                meal_type: mealType,
-            };
-
-            createScheduleMutation.mutate(scheduleData);
+            if (isNewSchedule) {
+                onDrop(data, true, date, mealType);
+            } else {
+                onDrop(data, false, date, mealType);
+            }
         } catch (error) {
-            console.error('Error handling drop:', error);
+            console.error('Error processing drop: ', error);
         }
     };
 
     return (
         <Box
             onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             sx={{
                 minHeight: '60px',
-                p: 1,
-                backgroundColor: 'background.default',
+                height: '100%',
+                backgroundColor: isOver ? 'action.hover' : 'background.default',
                 borderRadius: 1,
-                position: 'relative',
-                '&:hover': {
-                    backgroundColor: 'action.hover',
-                }
+                transition: 'background-color 0.2s ease'
             }}
         >
             {children}
