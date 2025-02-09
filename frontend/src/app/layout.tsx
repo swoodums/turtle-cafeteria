@@ -1,7 +1,7 @@
 /* frontend/src/app/layout.tsx */
 
-import { Providers } from './providers';
-import Layout from '@/components/navigation/Layout';
+import { Providers } from "./providers";
+import Layout from "@/components/navigation/Layout";
 
 export default function RootLayout({
   children,

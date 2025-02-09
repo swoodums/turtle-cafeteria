@@ -25,6 +25,8 @@
         A learning project for the meal-planning app Turtle Cafeteria.
         <br />
     </p>
+      <a href="#badge">
+    <img alt="code style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square"></a>
 </div>
 
 
@@ -224,7 +226,6 @@ Lorem ipsum
 Distributed under the MIT License. See `LICENSE` for more information.
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 
 <!-- CONTACT -->

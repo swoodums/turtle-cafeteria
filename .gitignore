@@ -26,6 +26,10 @@ backend/venv/
 /.next/
 /out/
 
+# Cache
+.eslintcache
+.prettier-cache
+
 # production
 /build
 
