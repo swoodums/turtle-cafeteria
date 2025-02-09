@@ -3,16 +3,21 @@
 import React, { useState } from 'react';
 import { Box } from '@mui/material';
 import { Recipe } from '@/types/recipes/recipe.types';
-import { MealType } from '@/types/schedules/schedule.types';
+import { Schedule, MealType } from '@/types/schedules/schedule.types';
 
 interface CalendarCellProps {
     date: Date;
     mealType: MealType;
-    onDrop: (recipe: Recipe, date: Date, mealType: MealType) => void;
+    onDrop: (recipe: Recipe | Schedule, isNewSchedule: boolean, date: Date, mealType: MealType) => void;
     children?: React.ReactNode;
 }
 
-export default function CalendarCell({ date, mealType, onDrop, children }: CalendarCellProps) {
+export default function CalendarCell({
+    date,
+    mealType,
+    onDrop,
+    children
+}: CalendarCellProps) {
     const [isOver, setIsOver] = useState(false);
 
     const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
@@ -31,11 +36,16 @@ export default function CalendarCell({ date, mealType, onDrop, children }: Calen
         setIsOver(false);
 
         try {
-            const recipeData = e.dataTransfer.getData('application/json');
-            const recipe = JSON.parse(recipeData) as Recipe;
-            onDrop(recipe, date, mealType);
+            const data = JSON.parse(e.dataTransfer.getData('application/json'));
+            const isNewSchedule = !data.type || data.type !== 'schedule';
+
+            if (isNewSchedule) {
+                onDrop(data, true, date, mealType);
+            } else {
+                onDrop(data, false, date, mealType);
+            }
         } catch (error) {
-            console.error('Error processing dropped recipe: ', error);
+            console.error('Error processing drop: ', error);
         }
     };
 

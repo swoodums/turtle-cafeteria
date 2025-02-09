@@ -2,7 +2,7 @@
 
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useQuery, useQueryClient, useMutation } from '@tanstack/react-query';
 import {
     Box,
@@ -17,9 +17,8 @@ import {
     ChevronLeft,
     ChevronRight,
 } from '@mui/icons-material';
-import { DropResult } from '@hello-pangea/dnd';
 import scheduleService from '@/services/scheduleService';
-import { MealType, ScheduleCreate } from '@/types/schedules/schedule.types';
+import { MealType, Schedule, ScheduleCreate, ScheduleUpdate } from '@/types/schedules/schedule.types';
 import { Recipe } from '@/types/recipes/recipe.types';
 import CalendarCell from './CalendarCell';
 import ScheduleCard from './ScheduleCard';
@@ -35,6 +34,7 @@ export default function WeeklyCalendar() {
     });
 
     const [alertOpen, setAlertOpen] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
 
     // Calculate week range
     const weekStart = new Date(currentWeek);
@@ -64,27 +64,87 @@ export default function WeeklyCalendar() {
         },
     });
 
+    const updateScheduleMutation = useMutation({
+        mutationFn: (data: { id: number, updates: ScheduleUpdate }) =>
+            scheduleService.updateSchedule(data.id, data.updates),
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: ['schedules'] });
+        },
+    });
+
     {/* Define how to drop recipes on calendar */}
-    const handleRecipeDrop = (recipe: Recipe, date: Date, mealType: MealType) => {
+    const handleDrop = (item: Recipe | Schedule | { type: string, schedule: Schedule }, isNewSchedule: boolean,  date: Date, mealType: MealType) => {
         // Format date manually to preserve local date
         const formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
         // Check existing schedules for this date and meal type
         const existingSchedules = getSchedulesForDate(date, mealType);
 
-        if (existingSchedules.length >= 3) {
-            setAlertOpen(true);
-            return;
+        if (isNewSchedule) {
+            // Handle new recipe drop
+            const recipe = item as Recipe;
+
+            // Check if recipe is already schedules
+            const isDuplicate = existingSchedules.some(
+                schedule => schedule.recipe_id === recipe.id
+            );
+
+            if(isDuplicate) {
+                setAlertMessage(`${recipe.title} is already scheduled for this meal`);
+                setAlertOpen(true);
+                return;
+            }
+            
+            if (existingSchedules.length >= 3) {
+                setAlertOpen(true);
+                return;
+            }
+
+            const scheduleData: ScheduleCreate = {
+                recipe_id: recipe.id,
+                start_date: formattedDate,
+                end_date: formattedDate,
+                meal_type: mealType,
+            };
+            createScheduleMutation.mutate(scheduleData);
+        } else {
+            // Handle existing schedule move
+            const scheduleData = (item as { type: string, schedule: Schedule }).schedule;
+
+            // Don't update if dropped in same spot
+            if (scheduleData.start_date === formattedDate && scheduleData.meal_type === mealType) {
+                return;
+            }
+
+            // Check if recipe is already scheduled in target cell
+            const isDuplicate = existingSchedules.some(
+                schedule =>
+                    schedule.recipe_id === scheduleData.recipe_id &&
+                    schedule.id !== scheduleData.id     // Exclude the schedule being moved.
+            );
+
+            if (isDuplicate) {
+                setAlertMessage(`${scheduleData.recipe?.title} is already scheduled for this meal`);
+                setAlertOpen(true);
+                return;
+            }
+
+            // Filter out the schedule being moved when checking limit
+            const otherSchedules = existingSchedules.filter(s => s.id !== scheduleData.id);
+            if (otherSchedules.length >= 3) {
+                setAlertOpen(true);
+                return;
+            }
+
+            updateScheduleMutation.mutate({
+                id: scheduleData.id,
+                updates: {
+                    start_date: formattedDate,
+                    end_date: formattedDate,
+                    meal_type: mealType
+                }
+            });
         }
-
-        const scheduleData: ScheduleCreate = {
-            recipe_id: recipe.id,
-            start_date: formattedDate,
-            end_date: formattedDate,
-            meal_type: mealType,
-        };
-
-        createScheduleMutation.mutate(scheduleData);
     };
 
     // Generate array of dates for current week
@@ -247,43 +307,21 @@ export default function WeeklyCalendar() {
                                             {mealType}
                                         </Typography>
 
-                                        {/* Scrollable content area */}
                                         <CalendarCell
                                             date={date}
                                             mealType={mealType}
-                                            onDrop={handleRecipeDrop}
+                                            onDrop={handleDrop}
                                         >
-                                            <Box sx={{
-                                                flexGrow: 1,
-                                                overflowY: 'auto',
-                                                minWidth: 0,
-                                                p: 1,
-                                                '&::-webkit-scrollbar': {
-                                                    width: '8px',
-                                                },
-                                                '&::-webkit-scrollbar-track': {
-                                                    background: 'transparent'
-                                                },
-                                                '&::-webkit-scrollbar-thumb': {
-                                                    background: '#bbb',
-                                                    borderRadius: '4px',
-                                                    '&:hover': {
-                                                        background: '#999'
-                                                    }
-                                                }
-
-                                            }}>
-                                                <Stack spacing={1} sx={{ minWidth: 0 }}>
-                                                    {getSchedulesForDate(date, mealType).map(schedule => (
-                                                        <ScheduleCard
-                                                            key={schedule.id}
-                                                            schedule={schedule}
-                                                            mealType={mealType}
-                                                            colors={getMealTypeColors(mealType)}
-                                                        />
-                                                    ))}
-                                                </Stack>
-                                            </Box>                           
+                                            <Stack spacing={1} sx={{ minWidth: 0 }}>
+                                                {getSchedulesForDate(date, mealType).map(schedule => (
+                                                    <ScheduleCard
+                                                        key={schedule.id}
+                                                        schedule={schedule}
+                                                        mealType={mealType}
+                                                        colors={getMealTypeColors(mealType)}
+                                                    />
+                                                ))}
+                                            </Stack>                       
                                         </CalendarCell>
                                     </Paper>
                                 ))}
@@ -307,7 +345,7 @@ export default function WeeklyCalendar() {
                     variant="filled"
                     sx={{ width: '100%' }}
                 >
-                    Maximum of 3 recipes allowed
+                    {alertMessage}
                 </Alert>
             </Snackbar>
         </>

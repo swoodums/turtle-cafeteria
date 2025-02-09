@@ -156,12 +156,18 @@ Click on a recipe card to view the whole recipe!
 <img src="images/recipe-detail.png" alt="Recipe Detail Page">
 
 Create a new recipe!
+
 <img src="images/create_recipe.png" alt="Create Recipe Page">
 
-Schedule a recipe for a date!
+Schedule a recipe for a date!  The recipes on the right drop down with details, and can be dragged and dropped on to a meal to schedule it there.  Scheduled recipes can be dragged to another date.
+
 <img src="images/schedule_recipe.png" alt="Schedule Recipe Page">
 
-_For more examples, please refer to the [Documentation](https://example.com)_
+The scheduled recipes are also buttons.  Clicking it will bring up a popover menu to view the recipe, edit the schedule, or delete the schedule:
+
+<img src="images/schedule_popover_menu.png" alt="Schedule Popover Menu">
+
+<!-- _For more examples, please refer to the [Documentation](https://example.com)_ -->
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

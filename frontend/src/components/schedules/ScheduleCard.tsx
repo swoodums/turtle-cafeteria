@@ -72,70 +72,100 @@ export default function ScheduleCard({ schedule, mealType, colors }: ScheduleCar
         handleClose();
     };
 
+    const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+        const dragData = {
+            type: 'schedule',
+            schedule: schedule
+        };
+        e.dataTransfer.setData('application/json', JSON.stringify(dragData));
+        if (e.currentTarget.classList) {
+            e.currentTarget.classList.add('dragging')
+        }
+    };
+
+    const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+        if(e.currentTarget.classList) {
+            e.currentTarget.classList.remove('dragging');
+        }
+    };
+
     return (
         <>
-            <Tooltip
-                title={
-                    <Box sx={{ p:1, display: 'block' }}>
-                        <Typography variant="subtitle1" display="block">
-                        {schedule.recipe?.title}
-                        </Typography>
-                        <Typography variant="caption" display="block">
-                        🕒 {schedule.recipe?.cooking_time} minutes
-                        </Typography>
-                        <Typography variant="caption" display="block">
-                            👥 Serves {schedule.recipe?.servings}
-                        </Typography>
-                        {schedule.notes && (
-                            <Typography variant="caption" display="block">
-                                📝 {schedule.notes}
-                            </Typography>
-                        )}
-                    </Box>
-                }
+            <div
+                draggable
+                onDragStart={handleDragStart}
+                onDragEnd={handleDragEnd}
             >
-                <ButtonBase
-                    onClick={handleClick}
-                    sx={{
-                        width: '100%',
-                        display:'block',
-                        textAlign: 'left'
-                    }}
+                <Tooltip
+                    title={
+                        <Box sx={{ p:1, display: 'block' }}>
+                            <Typography variant="subtitle1" display="block">
+                            {schedule.recipe?.title}
+                            </Typography>
+                            <Typography variant="caption" display="block">
+                            🕒 {schedule.recipe?.cooking_time} minutes
+                            </Typography>
+                            <Typography variant="caption" display="block">
+                                👥 Serves {schedule.recipe?.servings}
+                            </Typography>
+                            {schedule.notes && (
+                                <Typography variant="caption" display="block">
+                                    📝 {schedule.notes}
+                                </Typography>
+                            )}
+                        </Box>
+                    }
                 >
-                    <Paper
+                    <ButtonBase
+                        onClick={handleClick}
                         sx={{
-                            p: 1,
-                            backgroundColor: colors.light,
-                            cursor: 'pointer',
-                            position: 'relative',
-                            '&:hover': {
-                                backgroundColor: colors.main,
-                                '& .MuiTypography-root': {
-                                    color: colors.text
-                                }
-                            }
+                            width: '100%',
+                            display:'block',
+                            textAlign: 'left'
                         }}
                     >
-                        <Box sx={{
-                            overflow: 'hidden',
-                            flexGrow: 1,
-                            width: '100%'
-                        }}>
-                            <Typography
-                                variant="body2"
-                                sx={{
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis',
-                                    fontSize: '0.875rem',
-                                    whiteSpace: 'nowrap'
-                                }}
-                            >
-                                {schedule.recipe?.title}
-                            </Typography>
-                        </Box>
-                    </Paper>
-                </ButtonBase>
-            </Tooltip>
+                        <Paper
+                            sx={{
+                                p: 1,
+                                backgroundColor: colors.light,
+                                cursor: 'grab',
+                                position: 'relative',
+                                '&:.active': {
+                                    cursor: 'grabbing'
+                                },
+                                '&:.dragging': {
+                                    opacity: 0.8,
+                                    boxShadow: 3
+                                },
+                                '&:hover': {
+                                    backgroundColor: colors.main,
+                                    '& .MuiTypography-root': {
+                                        color: colors.text
+                                    }
+                                }
+                            }}
+                        >
+                            <Box sx={{
+                                overflow: 'hidden',
+                                flexGrow: 1,
+                                width: '100%'
+                            }}>
+                                <Typography
+                                    variant="body2"
+                                    sx={{
+                                        overflow: 'hidden',
+                                        textOverflow: 'ellipsis',
+                                        fontSize: '0.875rem',
+                                        whiteSpace: 'nowrap'
+                                    }}
+                                >
+                                    {schedule.recipe?.title}
+                                </Typography>
+                            </Box>
+                        </Paper>
+                    </ButtonBase>
+                </Tooltip>
+            </div>
 
             {/* Menu Popover */}
             <Popover
