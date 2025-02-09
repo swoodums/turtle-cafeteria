@@ -10,16 +10,26 @@ const compat = new FlatCompat({
   baseDirectory: __dirname,
 });
 
-const eslintConfig = [
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+const nextConfig = compat.config({
+  extends: ["next/core-web-vitals", "next/typescript"],
+  settings: {
+    next: {
+      rootDir: __dirname
+    }
+  },
+  rules: {
+    "@next/next/no-html-link-for-pages": ["error", "src/app"]
+  }
+});
+
+export default [
+  ...nextConfig,
   {
     files: ["**/*.{jsx,tsx}"],
     rules: {
       "react/react-in-jsx-scope": "off",
       "react/prop-types": "off"
     }
-  }
+  },
+  eslintConfigPrettier
 ];
-const defaultExports = [  eslintConfig,  eslintConfigPrettier,]
-
-export default defaultExports;
