@@ -1,223 +1,221 @@
 /* frontend/sr/components/schedule/ScheduleCard.tsx */
 
-import React, { useState } from 'react';
+import React, { useState } from "react";
 import {
-    Paper,
-    Typography,
-    MenuItem,
-    Box,
-    Tooltip,
-    Popover,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
-    ButtonBase } from '@mui/material';
-import { MealType, Schedule } from '@/types/schedules/schedule.types';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from 'next/navigation';
-import scheduleService from '@/services/scheduleService';
-import EditScheduleModal from './EditScheduleModal';
+  Paper,
+  Typography,
+  MenuItem,
+  Box,
+  Tooltip,
+  Popover,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  ButtonBase,
+} from "@mui/material";
+import { MealType, Schedule } from "@/types/schedules/schedule.types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useRouter } from "next/navigation";
+import scheduleService from "@/services/scheduleService";
+import EditScheduleModal from "./EditScheduleModal";
 
 interface ScheduleCardProps {
-    schedule: Schedule;
-    mealType: MealType;
-    colors: {
-        light: string;
-        main: string;
-        text: string;
-    };
+  schedule: Schedule;
+  mealType: MealType;
+  colors: {
+    light: string;
+    main: string;
+    text: string;
+  };
 }
 
-export default function ScheduleCard({ schedule, mealType, colors }: ScheduleCardProps) {
-    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-    const queryClient = useQueryClient();
-    const router = useRouter();
+export default function ScheduleCard({ schedule, colors }: ScheduleCardProps) {
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
+  const router = useRouter();
 
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorEl(event.currentTarget);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+
+  const deleteMutation = useMutation({
+    mutationFn: () => scheduleService.deleteSchedule(schedule.id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["schedules"] });
+      handleClose();
+    },
+  });
+
+  const handleDelete = () => {
+    setDeleteDialogOpen(true);
+    handleClose();
+  };
+
+  const handleConfirmDelete = () => {
+    deleteMutation.mutate();
+    setDeleteDialogOpen(false);
+  };
+
+  const handleViewRecipe = () => {
+    router.push(`/recipes/${schedule.recipe_id}`);
+  };
+
+  const handleEdit = () => {
+    setIsEditModalOpen(true);
+    handleClose();
+  };
+
+  const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
+    const dragData = {
+      type: "schedule",
+      schedule: schedule,
     };
+    e.dataTransfer.setData("application/json", JSON.stringify(dragData));
+    if (e.currentTarget.classList) {
+      e.currentTarget.classList.add("dragging");
+    }
+  };
 
-    const handleClose = () => {
-        setAnchorEl(null);
-    };
+  const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
+    if (e.currentTarget.classList) {
+      e.currentTarget.classList.remove("dragging");
+    }
+  };
 
-    const deleteMutation = useMutation({
-        mutationFn: () => scheduleService.deleteSchedule(schedule.id),
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['schedules'] });
-            handleClose();
-        },
-    });
-
-    const handleDelete = () => {
-        setDeleteDialogOpen(true);
-        handleClose;
-    };
-
-    const handleConfirmDelete = () => {
-        deleteMutation.mutate();
-        setDeleteDialogOpen(false);
-    };
-
-    const handleViewRecipe = () => {
-        router.push(`/recipes/${schedule.recipe_id}`);
-    };
-
-    const handleEdit = () => {
-        setIsEditModalOpen(true);
-        handleClose();
-    };
-
-    const handleDragStart = (e: React.DragEvent<HTMLDivElement>) => {
-        const dragData = {
-            type: 'schedule',
-            schedule: schedule
-        };
-        e.dataTransfer.setData('application/json', JSON.stringify(dragData));
-        if (e.currentTarget.classList) {
-            e.currentTarget.classList.add('dragging')
-        }
-    };
-
-    const handleDragEnd = (e: React.DragEvent<HTMLDivElement>) => {
-        if(e.currentTarget.classList) {
-            e.currentTarget.classList.remove('dragging');
-        }
-    };
-
-    return (
-        <>
-            <div
-                draggable
-                onDragStart={handleDragStart}
-                onDragEnd={handleDragEnd}
+  return (
+    <>
+      <div draggable onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+        <Tooltip
+          title={
+            <Box sx={{ p: 1, display: "block" }}>
+              <Typography variant="subtitle1" display="block">
+                {schedule.recipe?.title}
+              </Typography>
+              <Typography variant="caption" display="block">
+                🕒 {schedule.recipe?.cooking_time} minutes
+              </Typography>
+              <Typography variant="caption" display="block">
+                👥 Serves {schedule.recipe?.servings}
+              </Typography>
+              {schedule.notes && (
+                <Typography variant="caption" display="block">
+                  📝 {schedule.notes}
+                </Typography>
+              )}
+            </Box>
+          }
+        >
+          <ButtonBase
+            onClick={handleClick}
+            sx={{
+              width: "100%",
+              display: "block",
+              textAlign: "left",
+            }}
+          >
+            <Paper
+              sx={{
+                p: 1,
+                backgroundColor: colors.light,
+                cursor: "grab",
+                position: "relative",
+                "&:.active": {
+                  cursor: "grabbing",
+                },
+                "&:.dragging": {
+                  opacity: 0.8,
+                  boxShadow: 3,
+                },
+                "&:hover": {
+                  backgroundColor: colors.main,
+                  "& .MuiTypography-root": {
+                    color: colors.text,
+                  },
+                },
+              }}
             >
-                <Tooltip
-                    title={
-                        <Box sx={{ p:1, display: 'block' }}>
-                            <Typography variant="subtitle1" display="block">
-                            {schedule.recipe?.title}
-                            </Typography>
-                            <Typography variant="caption" display="block">
-                            🕒 {schedule.recipe?.cooking_time} minutes
-                            </Typography>
-                            <Typography variant="caption" display="block">
-                                👥 Serves {schedule.recipe?.servings}
-                            </Typography>
-                            {schedule.notes && (
-                                <Typography variant="caption" display="block">
-                                    📝 {schedule.notes}
-                                </Typography>
-                            )}
-                        </Box>
-                    }
+              <Box
+                sx={{
+                  overflow: "hidden",
+                  flexGrow: 1,
+                  width: "100%",
+                }}
+              >
+                <Typography
+                  variant="body2"
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    fontSize: "0.875rem",
+                    whiteSpace: "nowrap",
+                  }}
                 >
-                    <ButtonBase
-                        onClick={handleClick}
-                        sx={{
-                            width: '100%',
-                            display:'block',
-                            textAlign: 'left'
-                        }}
-                    >
-                        <Paper
-                            sx={{
-                                p: 1,
-                                backgroundColor: colors.light,
-                                cursor: 'grab',
-                                position: 'relative',
-                                '&:.active': {
-                                    cursor: 'grabbing'
-                                },
-                                '&:.dragging': {
-                                    opacity: 0.8,
-                                    boxShadow: 3
-                                },
-                                '&:hover': {
-                                    backgroundColor: colors.main,
-                                    '& .MuiTypography-root': {
-                                        color: colors.text
-                                    }
-                                }
-                            }}
-                        >
-                            <Box sx={{
-                                overflow: 'hidden',
-                                flexGrow: 1,
-                                width: '100%'
-                            }}>
-                                <Typography
-                                    variant="body2"
-                                    sx={{
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        fontSize: '0.875rem',
-                                        whiteSpace: 'nowrap'
-                                    }}
-                                >
-                                    {schedule.recipe?.title}
-                                </Typography>
-                            </Box>
-                        </Paper>
-                    </ButtonBase>
-                </Tooltip>
-            </div>
+                  {schedule.recipe?.title}
+                </Typography>
+              </Box>
+            </Paper>
+          </ButtonBase>
+        </Tooltip>
+      </div>
 
-            {/* Menu Popover */}
-            <Popover
-                open={Boolean(anchorEl)}
-                anchorEl={anchorEl}
-                onClose={handleClose}
-                anchorOrigin={{
-                    vertical: 'bottom',
-                    horizontal: 'right',
-                }}
-                transformOrigin={{
-                    vertical: 'top',
-                    horizontal: 'right',
-                }}
-            >
-                <MenuItem onClick={handleViewRecipe}>View Recipe</MenuItem>
-                <MenuItem onClick={handleEdit}>Edit Schedule</MenuItem>
-                <MenuItem onClick={handleDelete}>Delete Schedule</MenuItem>
-            </Popover>
+      {/* Menu Popover */}
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleClose}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "right",
+        }}
+      >
+        <MenuItem onClick={handleViewRecipe}>View Recipe</MenuItem>
+        <MenuItem onClick={handleEdit}>Edit Schedule</MenuItem>
+        <MenuItem onClick={handleDelete}>Delete Schedule</MenuItem>
+      </Popover>
 
-            {/* Edit Modal */}
-            <EditScheduleModal
-                schedule={schedule}
-                open={isEditModalOpen}
-                onClose={() => setIsEditModalOpen(false)}
-            />
+      {/* Edit Modal */}
+      <EditScheduleModal
+        schedule={schedule}
+        open={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+      />
 
-            {/* Delete Confirmation Dialog */}
-            <Dialog
-                open={deleteDialogOpen}
-                onClose={() => setDeleteDialogOpen(false)}
-                aria-labelledby="delete-dialog-title"
-            >
-                <DialogTitle id="delete-dialog-title">
-                    Hold up, partner
-                </DialogTitle>
-                <DialogContent>
-                    Reckon you fixin' to remove "{schedule.recipe?.title}" from your schedule?
-                </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setDeleteDialogOpen(false)}>
-                        Whoa, there!
-                    </Button>
-                    <Button
-                        onClick={handleConfirmDelete}
-                        color="error"
-                        variant="contained"
-                    >
-                        Giddyup
-                    </Button>
-                </DialogActions>
-            </Dialog>
-        </>
-    );
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+        aria-labelledby="delete-dialog-title"
+      >
+        <DialogTitle id="delete-dialog-title">Hold up, partner</DialogTitle>
+        <DialogContent>
+          Reckon you fixin to remove {schedule.recipe?.title} from your
+          schedule?
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setDeleteDialogOpen(false)}>
+            Whoa, there!
+          </Button>
+          <Button
+            onClick={handleConfirmDelete}
+            color="error"
+            variant="contained"
+          >
+            Giddyup
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </>
+  );
 }

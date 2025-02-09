@@ -9,7 +9,7 @@ import { DragDropContext, DropResult } from '@hello-pangea/dnd';
 
 export default function SchedulePage() {
     const handleDragEnd = (result: DropResult) => {
-        const { destination, source, draggableId } = result;
+        const { destination, draggableId } = result;
 
         // Drop was cancelled or occurred outside valid drop target
         if (!destination) return;
@@ -17,17 +17,6 @@ export default function SchedulePage() {
         // Extract recipe ID from draggableId
         const recipeId = parseInt(draggableId.split('-')[1]);
         if (isNaN(recipeId)) return;
-
-        //Extract date and meal type from destination droppableId
-        const [dateStr, mealType] = destination.droppableId.split('-');
-        const date = new Date(dateStr);
-
-        // Log the drag operation (for debugging)
-        console.log('Drag completed:', {
-            recipeId,
-            date: date.toISOString(),
-            mealType
-        });
     };
 
     return (
