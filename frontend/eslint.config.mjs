@@ -11,7 +11,9 @@ const compat = new FlatCompat({
 });
 
 const nextConfig = compat.config({
-  extends: ["next/core-web-vitals", "next/typescript"],
+  extends: ["next/core-web-vitals",
+    "next/typescript",
+    "plugin:react-hooks/recommended"],
   settings: {
     next: {
       rootDir: __dirname
