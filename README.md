@@ -116,6 +116,7 @@ The backend is built with FastAPI and SQLite.  The front end is built with Next.
 - [x] Add navigation
 - [x] Create page for scheduling
 - [x] Add drag and drop scheduling
+- [ ] Add Cooking Mode for recipe
 - [ ] Create page for creating/editing ingredients
 - [ ] Add testing
 - [ ] Flesh out idea for images
