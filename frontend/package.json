@@ -19,6 +19,7 @@
     "lucide-react": "^0.474.0",
     "next": "15.1.6",
     "react": "^19.0.0",
+    "react-confetti": "^6.2.2",
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
@@ -26,12 +27,12 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "eslint": "^9",
+    "eslint": "^8.57.1",
     "eslint-config-next": "15.1.6",
     "eslint-config-prettier": "^10.0.1",
-    "prettier": "3.4.2",
-    "typescript": "^5",
     "eslint-plugin-react": "^7.33.2",
-    "eslint-plugin-react-hooks": "^4.6.0"
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "prettier": "3.4.2",
+    "typescript": "^5"
   }
 }
