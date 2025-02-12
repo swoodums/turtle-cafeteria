@@ -1,4 +1,6 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+from app.models.ingredient_model import Ingredient
+from app.models.measurement_model import MeasurementUnit
 
 # Direction schemas
 
@@ -17,9 +19,9 @@ class Direction(DirectionBase):
 # Ingredient schemas
 
 class RecipeIngredientBase(BaseModel):
-    name: str
-    quantity: float
-    unit: str
+    ingredient_id: int
+    quantity: float = Field(gt=0)   # quantity must be positive
+    unit_id: int
 
 class RecipeIngredientCreate(RecipeIngredientBase):
     pass
@@ -27,6 +29,8 @@ class RecipeIngredientCreate(RecipeIngredientBase):
 class RecipeIngredient(RecipeIngredientBase):
     id: int
     recipe_id: int
+    ingredient: Ingredient
+    unit: MeasurementUnit
     model_config=ConfigDict(from_attributes=True)
 
 # Recipe schemas

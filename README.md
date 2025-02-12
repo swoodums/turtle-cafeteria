@@ -116,7 +116,7 @@ The backend is built with FastAPI and SQLite.  The front end is built with Next.
 - [x] Add navigation
 - [x] Create page for scheduling
 - [x] Add drag and drop scheduling
-- [ ] Add Cooking Mode for recipe
+- [x] Add Cooking Mode for recipe
 - [ ] Create page for creating/editing ingredients
 - [ ] Add testing
 - [ ] Flesh out idea for images
@@ -154,13 +154,17 @@ Use the navigation bar on the left to drive!
 
 <img src="images/recipe-page.png" alt="Main Page">
 
+Create a new recipe!
+
+<img src="images/create_recipe.png" alt="Create Recipe Page">
+
 Click on a recipe card to view the whole recipe!
 
 <img src="images/recipe-detail.png" alt="Recipe Detail Page">
 
-Create a new recipe!
+Turn on Cook Mode to click on ingredients and directions to mark them complete!
 
-<img src="images/create_recipe.png" alt="Create Recipe Page">
+<img src="images/cook-mode.png" alt="Recipe Detail Page">
 
 Schedule a recipe for a date!  The recipes on the right drop down with details, and can be dragged and dropped on to a meal to schedule it there.  Scheduled recipes can be dragged to another date.
 

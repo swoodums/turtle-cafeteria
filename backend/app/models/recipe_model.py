@@ -68,9 +68,11 @@ class RecipeIngredient(Base):
 
     id: Mapped[int] = mapped_column(primary_key=True)
     recipe_id: Mapped[int] = mapped_column(ForeignKey("recipes.id"))
-    name: Mapped[str] = mapped_column()
+    ingredient_id: Mapped[int] = mapped_column(ForeignKey("ingredients.id"))
     quantity: Mapped[float] = mapped_column()
-    unit: Mapped[str] = mapped_column()
+    unit_id: Mapped[int] = mapped_column(ForeignKey("measurement_units.id"))
 
     # Relationship to recipe
     recipe: Mapped["Recipe"] = relationship("Recipe", back_populates="recipe_ingredients")
+    ingredient: Mapped["Ingredient"] = relationship("Ingredient", back_populates="recipe_ingredients")
+    unit: Mapped["MeasurementUnit"] = relationship("MeasurementUnit")
