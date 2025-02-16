@@ -12,8 +12,6 @@ router = APIRouter(
     tags=["Recipe Ingredients"]
 )
 
-
-
 @router.post(
     "/recipe/{recipe_id}",
     response_model=recipe_schema.RecipeIngredient,

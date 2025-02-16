@@ -1,6 +1,6 @@
 # backend/app/models/recipe_model.py
 
-from typing import List, Optional
+from typing import List
 from sqlalchemy import Text, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base

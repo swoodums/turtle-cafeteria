@@ -2,10 +2,17 @@
 
 from typing import Optional
 from datetime import date
+from enum import Enum as PyEnum
 from sqlalchemy import Text, ForeignKey, Date, CheckConstraint, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base
-from app.schemas.schedule_schema import MealType
+
+class MealType(str, PyEnum):
+    """Enumeration of possible meal types"""
+    BREAKFAST = 'breakfast'
+    LUNCH = 'lunch'
+    DINNER = 'dinner'
+    SNACKS = 'snacks'
 
 class Schedule(Base):
     """

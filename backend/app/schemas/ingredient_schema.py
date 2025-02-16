@@ -1,9 +1,9 @@
 # backend/app/schemas/ingredient_schema.py
 
 from typing import Optional
-from pydantic import BaseModel, ConfigDict, field_validator, Field
+from pydantic import BaseModel, ConfigDict
 from app.models.ingredient_model import IngredientCategory
-from app.models.measurement_model import MeasurementUnit
+from app.schemas.measurement_schema import MeasurementUnit
 
 class IngredientBase(BaseModel):
     name: str
@@ -11,10 +11,11 @@ class IngredientBase(BaseModel):
     category: IngredientCategory
     description: Optional[str] = None
 
+    model_config = ConfigDict(from_attributes=True, arbitrary_types_allowed=True)
+
 class IngredientCreate(IngredientBase):
     pass
 
 class Ingredient(IngredientBase):
     id: int
     preferred_unit: MeasurementUnit
-    model_config = ConfigDict(from_attributes=True)

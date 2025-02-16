@@ -1,5 +1,6 @@
 # backend/app/models/measurement_model.py
 
+from typing import List
 from enum import Enum as PyEnum     # Consistency in distinguishing from sqlalchemy Enum in other models
 from sqlalchemy import ForeignKey, UniqueConstraint, CheckConstraint, Enum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -12,7 +13,6 @@ class UnitCategory(PyEnum):
     VOLUME = "volume"
     WEIGHT = "weight"
     QUANTITY = "quantity"
-    LENGTH = "length"
 
 class MeasurementUnit(Base):
     """
@@ -27,6 +27,23 @@ class MeasurementUnit(Base):
     is_metric: Mapped[bool] = mapped_column(default=False)
     is_common: Mapped[bool] = mapped_column(default=True) # For filtering less common units
 
+    # Back references for conversions
+    from_conversions: Mapped[List["UnitConversion"]] = relationship(
+        "UnitConversion",
+        foreign_keys="[UnitConversion.from_unit_id]",
+        back_populates="from_unit",
+        cascade="all, delete-orphan"
+    )
+    to_conversions: Mapped[List["UnitConversion"]] = relationship(
+        "UnitConversion",
+        foreign_keys="[UnitConversion.to_unit_id]",
+        back_populates="to_unit",
+        cascade="all, delete-orphan"
+    )
+
+    def __str__(self) -> str:
+        return f"{self.name} ({self.abbreviation})"
+
 class UnitConversion(Base):
     """
     Stores conversion ratios between different units
@@ -38,14 +55,16 @@ class UnitConversion(Base):
     to_unit_id: Mapped[int] = mapped_column(ForeignKey("measurement_units.id"))
     ratio: Mapped[float] = mapped_column()  # multiply from_unit by ratio to get to_unit
 
-    # Relationships
+    # Relationships using string literals for forward references
     from_unit: Mapped["MeasurementUnit"] = relationship(
         "MeasurementUnit",
-        foreign_keys=[from_unit_id]
+        foreign_keys=[from_unit_id],
+        back_populates="from_conversions"
     )
     to_unit: Mapped["MeasurementUnit"] = relationship(
         "MeasurementUnit",
-        foreign_keys=[to_unit_id]
+        foreign_keys=[to_unit_id],
+        back_populates="to_conversions"
     )
 
     # Ensure we don't have duplicate conversion pairs
