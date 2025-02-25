@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.database import engine
 from app.models import recipe_model, schedule_model
-from app.routes import recipes_routes, direction_routes, recipe_ingredients_routes, schedule_routes
+from app.routes import recipes_routes, direction_routes, recipe_ingredients_routes, schedule_routes, ingredient_routes, measurement_routes
 
 # Create the FastAPI app
 app = FastAPI(
@@ -46,3 +46,5 @@ app.include_router(recipes_routes.router, prefix="/api/v1")
 app.include_router(direction_routes.router, prefix="/api/v1")
 app.include_router(recipe_ingredients_routes.router, prefix="/api/v1")
 app.include_router(schedule_routes.router, prefix="/api/v1")
+app.include_router(ingredient_routes.router, prefix="/api/v1")
+app.include_router(measurement_routes.router, prefix="/api/v1")

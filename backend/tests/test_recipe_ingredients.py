@@ -1,8 +1,8 @@
 from fastapi import status
 
-def test_create_recipe_ingredient(client, created_recipe, sample_recipe_ingredient):
+def test_create_recipe_ingredient(client, created_recipe, sample_recipe_ingredient, sample_measurement_unit):
     """
-    Test creating a direction for an existing recipe
+    Test creating a recipe ingredient for an existing recipe
     """
     response = client.post(
         f"/api/v1/recipe_ingredients/recipe/{created_recipe['id']}",
@@ -12,9 +12,11 @@ def test_create_recipe_ingredient(client, created_recipe, sample_recipe_ingredie
     assert response.status_code == status.HTTP_201_CREATED
     data = response.json()
 
-    assert data["name"] == sample_recipe_ingredient["name"]
+    assert data["ingredient_id"] == sample_recipe_ingredient["ingredient_id"]
+    assert data["ingredient"]["name"] == sample_recipe_ingredient["name"]
     assert data["quantity"] == sample_recipe_ingredient["quantity"]
-    assert data["unit"] == sample_recipe_ingredient["unit"]
+    assert data["unit_id"] == sample_recipe_ingredient["unit_id"]
+    assert data["unit"]["name"] ==  sample_recipe_ingredient["unit_name"]
     assert data["recipe_id"] == created_recipe["id"]
     assert "id" in data
 
@@ -58,9 +60,9 @@ def test_update_recipe_ingredient(client, created_recipe_ingredient):
     Test updating a recipe ingredient
     """
     updated_data = {
-        "name": "Pepper",
+        "ingredient_id": 1,
         "quantity": 3,
-        "unit": "teaspoon"
+        "unit_id": 2
     }
 
     response = client.put(
@@ -72,9 +74,9 @@ def test_update_recipe_ingredient(client, created_recipe_ingredient):
     updated_recipe_ingredient = response.json()
 
     assert updated_recipe_ingredient["id"] == created_recipe_ingredient["id"]     # id should be unchanged
-    assert updated_recipe_ingredient["name"] == updated_data["name"]
+    assert updated_recipe_ingredient["ingredient"]["id"] == updated_data["ingredient_id"]
     assert updated_recipe_ingredient["quantity"] == updated_data["quantity"]
-    assert updated_recipe_ingredient["unit"] == updated_data["unit"]
+    assert updated_recipe_ingredient["unit"]["id"] == updated_data["unit_id"]
 
 def test_delete_recipe_ingredient(client, created_recipe_ingredient):
     """

@@ -1,14 +1,10 @@
+# backend/app/schema/schedule_schema.py
+
 from datetime import date
 from typing import Optional
-from enum import Enum
 from pydantic import BaseModel, ConfigDict, field_validator
 from app.schemas.recipe_schema import Recipe
-
-class MealType(str, Enum):
-    breakfast = 'breakfast'
-    lunch = 'lunch'
-    dinner = 'dinner'
-    snacks = 'snacks'
+from app.models.schedule_model import MealType
 
 # Schedule schemas
 
@@ -17,6 +13,8 @@ class ScheduleBase(BaseModel):
     end_date: date
     meal_type: Optional[MealType] = None
     notes: Optional[str] = None
+
+    model_config = ConfigDict(from_attributes=True)
 
     @field_validator('end_date')
     @classmethod
@@ -35,6 +33,8 @@ class ScheduleUpdate(BaseModel):
     meal_type: Optional[MealType] = None
     notes: Optional[str] = None
 
+    model_config = ConfigDict(from_attributes=True)
+
     @field_validator('end_date')
     @classmethod
     def end_date_must_not_precede_start_date(cls, v: date | None, info) -> date | None:
@@ -49,4 +49,3 @@ class Schedule(ScheduleBase):
     id: int
     recipe_id: int
     recipe: Recipe      # Enrich API response to include all recipe base data
-    model_config=ConfigDict(from_attributes=True)
