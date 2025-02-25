@@ -26,7 +26,7 @@
         <br />
     </p>
       <a href="#badge">
-    <img alt="code style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square"></a>
+    <img alt="ode style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square"></a>
 </div>
 
 
@@ -100,8 +100,8 @@ The backend is built with FastAPI and SQLite.  The front end is built with Next.
 - [x] Build out routes for Recipe Ingredients
 - [x] Build out data structures for scheduling
 - [x] Build out routes for scheduling
-- [ ] Build out data structures for Ingredients
-- [ ] Build out routes for Ingredients
+- [x] Build out data structures for Ingredients
+- [ x Build out routes for Ingredients
 - [ ] Integrate Ingredients into backend flow
 - [ ] Flesh out idea for image storage
 

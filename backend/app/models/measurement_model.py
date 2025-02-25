@@ -13,6 +13,7 @@ class UnitCategory(PyEnum):
     VOLUME = "volume"
     WEIGHT = "weight"
     QUANTITY = "quantity"
+    COUNT = "count"
 
 class MeasurementUnit(Base):
     """

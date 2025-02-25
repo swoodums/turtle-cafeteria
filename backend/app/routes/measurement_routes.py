@@ -31,9 +31,9 @@ def get_measurement_units(
     if category:
         query = query.filter(MeasurementUnit.category == category)
     if is_metric is not None:
-        query - query.filter(MeasurementUnit.is_metric == is_metric)
+        query = query.filter(MeasurementUnit.is_metric == is_metric)
     if is_common is not None:
-        query - query.filter(MeasurementUnit.is_common == is_common)
+        query = query.filter(MeasurementUnit.is_common == is_common)
     
     return query.all()
 

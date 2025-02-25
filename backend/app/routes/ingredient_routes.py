@@ -32,12 +32,12 @@ def create_ingredient(
 
     # Verify the measurement unit exists
     unit_exists = db.query(measurement_model.MeasurementUnit).filter(
-        measurement_model.MeasurementUnit.id == ingredient.unit_id
+        measurement_model.MeasurementUnit.id == ingredient.preferred_unit_id
     ).first() is not None
     if not unit_exists:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Measurement unit with id {ingredient.unit_id} not found"
+            detail=f"Measurement unit with id {ingredient.preferred_unit_id} not found"
         )
     
     # Check if ingredient with same name already exists
