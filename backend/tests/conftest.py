@@ -108,13 +108,13 @@ def seed_measurement_units(db_session):
         )
     ]
 
-    # Count units
-    count_units = [
+    # Quantity units
+    quantity_units = [
         MeasurementUnit(
             id=15,
             name="Piece",
             abbreviation="pc",
-            category=UnitCategory.COUNT,
+            category=UnitCategory.QUANTITY,
             is_metric=False,
             is_common=True
         ),
@@ -122,14 +122,14 @@ def seed_measurement_units(db_session):
             id=16,
             name="Dozen",
             abbreviation="doz",
-            category=UnitCategory.COUNT,
+            category=UnitCategory.QUANTITY,
             is_metric=False,
             is_common=True
         )
     ]
 
     # Add all units to the session
-    all_units = volume_units + weight_units + count_units
+    all_units = volume_units + weight_units + quantity_units
     for unit in all_units:
         db_session.add(unit)
     

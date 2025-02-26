@@ -101,7 +101,7 @@ The backend is built with FastAPI and SQLite.  The front end is built with Next.
 - [x] Build out data structures for scheduling
 - [x] Build out routes for scheduling
 - [x] Build out data structures for Ingredients
-- [ x Build out routes for Ingredients
+- [x] Build out routes for Ingredients
 - [ ] Integrate Ingredients into backend flow
 - [ ] Flesh out idea for image storage
 

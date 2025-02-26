@@ -10,7 +10,7 @@ import {
 } from "@/types/recipes";
 import { api } from "./api";
 
-export default {
+const recipeService = {
   getAllRecipes,
   getRecipeById,
   deleteRecipe,
@@ -23,6 +23,8 @@ export default {
   updateRecipeIngredient,
   deleteRecipeIngredient,
 };
+
+export default recipeService;
 
 async function getAllRecipes() {
   const { data } = await api.get<Recipe[]>("/recipe/");
