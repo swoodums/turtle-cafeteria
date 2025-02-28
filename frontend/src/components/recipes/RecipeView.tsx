@@ -275,7 +275,8 @@ export default function RecipeView({ recipeId }: RecipeViewProps) {
                   },
                 }}
               >
-                • {ingredient.name} - {ingredient.quantity} {ingredient.unit}
+                • {ingredient.ingredient.name} - {ingredient.quantity}{" "}
+                {ingredient.unit.abbreviation}
               </Typography>
             ))}
           </Box>

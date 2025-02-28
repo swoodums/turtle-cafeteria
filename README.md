@@ -26,7 +26,10 @@
         <br />
     </p>
       <a href="#badge">
-    <img alt="ode style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square"></a>
+    <img alt="Code style: prettier" src="https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square"></a>
+    <a href="https://github.com/psf/black">
+  <img alt="Code style: black" src="https://img.shields.io/badge/code_style-black-000000.svg?style=flat-square">
+</a>
 </div>
 
 
@@ -101,8 +104,8 @@ The backend is built with FastAPI and SQLite.  The front end is built with Next.
 - [x] Build out data structures for scheduling
 - [x] Build out routes for scheduling
 - [x] Build out data structures for Ingredients
-- [ x Build out routes for Ingredients
-- [ ] Integrate Ingredients into backend flow
+- [x] Build out routes for Ingredients
+- [x] Integrate Ingredients into backend flow
 - [ ] Flesh out idea for image storage
 
 ### Front End
@@ -117,7 +120,7 @@ The backend is built with FastAPI and SQLite.  The front end is built with Next.
 - [x] Create page for scheduling
 - [x] Add drag and drop scheduling
 - [x] Add Cooking Mode for recipe
-- [ ] Create page for creating/editing ingredients
+- [x] Create page for creating/editing ingredients
 - [ ] Add testing
 - [ ] Flesh out idea for images
 

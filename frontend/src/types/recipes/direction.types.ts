@@ -1,3 +1,5 @@
+/* frontend/src/types/recipes/direction.types.ts */
+
 // Base direction type that matches our backend model
 export interface Direction {
   id: number;

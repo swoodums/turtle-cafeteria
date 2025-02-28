@@ -18,6 +18,7 @@ import { usePathname, useRouter } from "next/navigation";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import MenuBookIcon from "@mui/icons-material/MenuBook";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import KitchenIcon from "@mui/icons-material/Kitchen";
 
 const DRAWER_WIDTH = 240;
 
@@ -31,6 +32,11 @@ const NAVIGATION_ITEMS = [
     title: "Create Recipe",
     path: "/recipes/new",
     icon: <AddCircleIcon />,
+  },
+  {
+    title: "Ingredients",
+    path: "/ingredients",
+    icon: <KitchenIcon />,
   },
   {
     title: "Weekly Calendar",

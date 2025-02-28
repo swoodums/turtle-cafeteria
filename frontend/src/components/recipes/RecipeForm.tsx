@@ -14,11 +14,20 @@ import {
   Stack,
   TextField,
   Typography,
+  Autocomplete,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  SelectChangeEvent,
 } from "@mui/material";
 import { Add as AddIcon, Delete as DeleteIcon } from "@mui/icons-material";
 import { Recipe, RecipeFormData } from "@/types/recipes";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import recipeService from "@/services/recipeService";
+import ingredientService from "@/services/ingredientService";
+import measurementService from "@/services/measurementService";
+import { Ingredient, MeasurementUnit } from "@/types/ingredients";
 
 interface RecipeFormProps {
   initialData?: Recipe;
@@ -31,6 +40,19 @@ export default function RecipeForm({
 }: RecipeFormProps) {
   const queryClient = useQueryClient();
   const router = useRouter();
+
+  // Fetch ingredients
+  const { data: ingredients, isLoading: loadingIngredients } = useQuery({
+    queryKey: ["ingredients"],
+    queryFn: () => ingredientService.getAllIngredients(),
+  });
+
+  // Fetch units
+  const { data: units, isLoading: loadingUnits } = useQuery({
+    queryKey: ["units"],
+    queryFn: () => measurementService.getAllUnits(),
+  });
+
   const [formData, setFormData] = useState<RecipeFormData>(() => {
     if (initialData) {
       return {
@@ -43,10 +65,10 @@ export default function RecipeForm({
         },
         recipeIngredients: initialData.recipe_ingredients?.map((ing) => ({
           id: ing.id,
-          name: ing.name,
+          ingredient_id: ing.ingredient_id,
           quantity: ing.quantity,
-          unit: ing.unit,
-        })) || [{ name: "", quantity: 0, unit: "" }],
+          unit_id: ing.unit_id,
+        })) || [{ ingredient_id: 0, quantity: 0, unit_id: 0 }],
         directions: initialData.directions?.map((dir) => ({
           id: dir.id,
           direction_number: dir.direction_number,
@@ -62,7 +84,7 @@ export default function RecipeForm({
         cooking_time: 0,
         servings: 1,
       },
-      recipeIngredients: [{ name: "", quantity: 0, unit: "" }],
+      recipeIngredients: [{ ingredient_id: 0, quantity: 0, unit_id: 0 }],
       directions: [{ direction_number: 1, instruction: "" }],
     };
   });
@@ -119,9 +141,9 @@ export default function RecipeForm({
               if (ing.id) {
                 // If ingredient has an ID, update it
                 await recipeService.updateRecipeIngredient(ing.id, {
-                  name: ing.name,
+                  ingredient_id: ing.ingredient_id,
                   quantity: ing.quantity,
-                  unit: ing.unit,
+                  unit_id: ing.unit_id,
                 });
               } else {
                 // If no ID, it's a new ingredient
@@ -162,13 +184,15 @@ export default function RecipeForm({
         // Then add recipe ingredients and directions
         await Promise.all([
           // Create all recipe ingredients
-          ...data.recipeIngredients.map((recipeIngredient) =>
-            recipeService.createRecipeIngregient(recipe.id, {
-              name: recipeIngredient.name,
-              quantity: recipeIngredient.quantity,
-              unit: recipeIngredient.unit,
-            }),
-          ),
+          ...data.recipeIngredients
+            .filter((ing) => ing.ingredient_id > 0) // Only create valid ingredients
+            .map((recipeIngredient) =>
+              recipeService.createRecipeIngregient(recipe.id, {
+                ingredient_id: recipeIngredient.ingredient_id,
+                quantity: recipeIngredient.quantity,
+                unit_id: recipeIngredient.unit_id,
+              }),
+            ),
           // Create all directions with sequential numbers
           ...data.directions.map((direction, index) =>
             recipeService.createDirection(recipe.id, {
@@ -237,7 +261,7 @@ export default function RecipeForm({
       ...prev,
       recipeIngredients: [
         ...prev.recipeIngredients,
-        { name: "", quantity: 0, unit: "" },
+        { ingredient_id: 0, quantity: 0, unit_id: 0 },
       ],
     }));
   };
@@ -248,6 +272,23 @@ export default function RecipeForm({
       ...prev,
       recipeIngredients: prev.recipeIngredients.filter((_, i) => i !== index),
     }));
+  };
+
+  // Update an ingredient
+  const handleIngredientChange = (
+    index: number,
+    newValue: Ingredient | null,
+  ) => {
+    // Update the ingredient ID
+    handleRecipeIngredientChange(index, "ingredient_id", newValue?.id || 0);
+    // If an ingredient was selected (not cleared), also set the unit to the preferred unit
+    if (newValue?.preferred_unit) {
+      handleRecipeIngredientChange(
+        index,
+        "unit_id",
+        newValue.preferred_unit.id,
+      );
+    }
   };
 
   const handleDirectionChange = (
@@ -297,6 +338,44 @@ export default function RecipeForm({
     e.preventDefault();
     recipeMutation.mutate(formData);
   };
+
+  // Helper to find an ingredient by ID
+  const getIngredientById = (ingredientId: number) => {
+    return ingredients?.find((ingredient) => ingredient.id === ingredientId);
+  };
+
+  // Funtion to determine if form can be submitted
+  const canSubmit = () => {
+    // Basic validation
+    if (!formData.recipeInfo.title || !formData.recipeInfo.description) {
+      return false;
+    }
+
+    // Validate directions
+    if (formData.directions.some((dir) => !dir.instruction.trim())) {
+      return false;
+    }
+
+    // Validate recipe ingredients
+    const hasValidIngredients = formData.recipeIngredients.some(
+      (ing) => ing.ingredient_id > 0 && ing.unit_id > 0 && ing.quantity > 0,
+    );
+
+    return hasValidIngredients;
+  };
+
+  // Group units by category for easier selection
+  const unitsByCategory = React.useMemo(() => {
+    if (!units) return {};
+
+    return units.reduce((acc: Record<string, MeasurementUnit[]>, unit) => {
+      if (!acc[unit.category]) {
+        acc[unit.category] = [];
+      }
+      acc[unit.category].push(unit);
+      return acc;
+    }, {});
+  }, [units]);
 
   return (
     <Container maxWidth="lg" className="py-8">
@@ -354,8 +433,12 @@ export default function RecipeForm({
               {/* Ingredients section*/}
               <section>
                 <Box
-                  className="flex justify-between items-center mb-4"
-                  sx={{ mb: 3 }}
+                  sx={{
+                    mb: 3,
+                    display: "flex",
+                    justifyContent: "sapce-between",
+                    alignItems: "center",
+                  }}
                 >
                   <Typography variant="h6">Ingredients 🛒</Typography>
                 </Box>
@@ -378,20 +461,36 @@ export default function RecipeForm({
                           flex: 1,
                         }}
                       >
-                        <TextField
-                          label="Ingredient Name"
-                          value={ingredient.name}
-                          onChange={(e) =>
-                            handleRecipeIngredientChange(
-                              index,
-                              "name",
-                              e.target.value,
-                            )
-                          }
-                          required
-                          fullWidth
-                          placeholder="e.g., Brussels Sprouts"
-                        />
+                        {loadingIngredients ? (
+                          <TextField
+                            label="Loading ingredients..."
+                            disabled
+                            fullWidth
+                          />
+                        ) : (
+                          <Autocomplete
+                            options={ingredients || []}
+                            getOptionLabel={(option) => option.name}
+                            isOptionEqualToValue={(option, value) =>
+                              option.id === value.id
+                            }
+                            value={
+                              getIngredientById(ingredient.ingredient_id) ||
+                              null
+                            }
+                            onChange={(_, newValue) =>
+                              handleIngredientChange(index, newValue)
+                            }
+                            renderInput={(params) => (
+                              <TextField
+                                {...params}
+                                label="Ingredient"
+                                required
+                                fullWidth
+                              />
+                            )}
+                          />
+                        )}
                         <TextField
                           label="Quantity"
                           type="number"
@@ -405,21 +504,49 @@ export default function RecipeForm({
                           }
                           required
                           fullWidth
+                          slotProps={{ htmlInput: { step: "0.01", min: "0" } }}
                         />
-                        <TextField
-                          label="Unit"
-                          value={ingredient.unit}
-                          onChange={(e) =>
-                            handleRecipeIngredientChange(
-                              index,
-                              "unit",
-                              e.target.value,
-                            )
-                          }
-                          required
-                          fullWidth
-                          placeholder="e.g., cups, tablespoons, pc"
-                        />
+                        {loadingUnits ? (
+                          <TextField
+                            label="Loading Units..."
+                            disabled
+                            fullWidth
+                          />
+                        ) : (
+                          <FormControl fullWidth required>
+                            <InputLabel>Unit</InputLabel>
+                            <Select
+                              value={ingredient.unit_id || ""}
+                              label="Unit"
+                              onChange={(
+                                e: SelectChangeEvent<string | number>,
+                              ) =>
+                                handleRecipeIngredientChange(
+                                  index,
+                                  "unit_id",
+                                  e.target.value,
+                                )
+                              }
+                            >
+                              <MenuItem value="" disabled>
+                                Select a unit
+                              </MenuItem>
+                              {Object.entries(unitsByCategory).map(
+                                ([category, categoryUnits]) => [
+                                  <MenuItem key={category} disabled divider>
+                                    {category.charAt(0).toUpperCase() +
+                                      category.slice(1).toLowerCase()}
+                                  </MenuItem>,
+                                  ...categoryUnits.map((unit) => (
+                                    <MenuItem key={unit.id} value={unit.id}>
+                                      {unit.name} ({unit.abbreviation})
+                                    </MenuItem>
+                                  )),
+                                ],
+                              )}
+                            </Select>
+                          </FormControl>
+                        )}
                       </Box>
                       <IconButton
                         onClick={() => handleRemoveRecipeIngredient(index)}
@@ -432,7 +559,7 @@ export default function RecipeForm({
                   ))}
                   <Box
                     className="flex justify-between items-center mb-4"
-                    sx={{ mb: 3 }}
+                    sx={{ mb: 2 }}
                   >
                     <Button
                       startIcon={<AddIcon />}
@@ -449,8 +576,12 @@ export default function RecipeForm({
               {/* Directions section */}
               <section>
                 <Box
-                  className="flex justify-between items-center mb-4"
-                  sx={{ mb: 3 }}
+                  sx={{
+                    mb: 3,
+                    display: "flex",
+                    justifyContent: "space-bewteen",
+                    alignItems: "center",
+                  }}
                 >
                   <Typography variant="h6">Directions 🪜</Typography>
                 </Box>
@@ -494,7 +625,7 @@ export default function RecipeForm({
                   ))}
                   <Box
                     className="flex justify-between items-center mb-4"
-                    sx={{ mb: 3 }}
+                    sx={{ mb: 2 }}
                   >
                     <Button
                       startIcon={<AddIcon />}
@@ -513,9 +644,13 @@ export default function RecipeForm({
                 <Button
                   type="submit"
                   variant="contained"
-                  disabled={recipeMutation.isPending}
+                  disabled={recipeMutation.isPending || !canSubmit()}
                 >
-                  {mode === "edit" ? "Update Recipe" : "Create Recipe"}
+                  {recipeMutation.isPending
+                    ? "Saving..."
+                    : mode === "edit"
+                      ? "Update Recipe"
+                      : "Create Recipe"}
                 </Button>
               </Box>
             </Stack>

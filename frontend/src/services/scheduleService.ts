@@ -1,3 +1,5 @@
+/* frontend/src/services/scheduleService.ts */
+
 import { api } from "./api";
 import {
   Schedule,
@@ -5,12 +7,14 @@ import {
   ScheduleUpdate,
 } from "@/types/schedules/schedule.types";
 
-export default {
+const scheduleService = {
   getSchedulesByDateRange,
   createSchedule,
   updateSchedule,
   deleteSchedule,
 };
+
+export default scheduleService;
 
 async function getSchedulesByDateRange(
   startDate: Date,
