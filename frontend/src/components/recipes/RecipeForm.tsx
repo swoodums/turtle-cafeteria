@@ -414,6 +414,7 @@ export default function RecipeForm({
                       type="number"
                       value={formData.recipeInfo.cooking_time}
                       onChange={handleBasicInfoChange}
+                      onFocus={(e) => e.target.select()}
                       required
                       slotProps={{ htmlInput: { min: 0 } }}
                     />
@@ -423,6 +424,7 @@ export default function RecipeForm({
                       type="number"
                       value={formData.recipeInfo.servings}
                       onChange={handleBasicInfoChange}
+                      onFocus={(e) => e.target.select()}
                       required
                       slotProps={{ htmlInput: { min: 1 } }}
                     />
@@ -502,6 +504,7 @@ export default function RecipeForm({
                               e.target.value,
                             )
                           }
+                          onFocus={(e) => e.target.select()}
                           required
                           fullWidth
                           slotProps={{ htmlInput: { step: "0.01", min: "0" } }}
