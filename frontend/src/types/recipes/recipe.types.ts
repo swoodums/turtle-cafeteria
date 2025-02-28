@@ -1,3 +1,5 @@
+/* frontend/src/types/recipes/recipe.types.ts*/
+
 import { RecipeIngredient } from "./recipe_ingredient.types";
 import { Direction } from "./direction.types";
 
