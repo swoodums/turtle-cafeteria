@@ -159,7 +159,7 @@ Use the navigation bar on the left to drive!
 
 Create a new recipe!
 
-<img src="images/create_recipe.png" alt="Create Recipe Page">
+<img src="images/create-recipe.png" alt="Create Recipe Page">
 
 Click on a recipe card to view the whole recipe!
 
@@ -171,11 +171,11 @@ Turn on Cook Mode to click on ingredients and directions to mark them complete!
 
 Schedule a recipe for a date!  The recipes on the right drop down with details, and can be dragged and dropped on to a meal to schedule it there.  Scheduled recipes can be dragged to another date.
 
-<img src="images/schedule_recipe.png" alt="Schedule Recipe Page">
+<img src="images/schedule-recipe.png" alt="Schedule Recipe Page">
 
-The scheduled recipes are also buttons.  Clicking it will bring up a popover menu to view the recipe, edit the schedule, or delete the schedule:
+View and add ingredients used to build recipes!
 
-<img src="images/schedule_popover_menu.png" alt="Schedule Popover Menu">
+<img src="images/ingredients.png" alt="Ingredients Page">
 
 <!-- _For more examples, please refer to the [Documentation](https://example.com)_ -->
 

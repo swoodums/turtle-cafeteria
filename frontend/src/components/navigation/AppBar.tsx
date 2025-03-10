@@ -87,12 +87,11 @@ export default function AppBar({
         <Toolbar>
           <IconButton
             color="inherit"
-            aria-label="open drawer"
+            aria-label={isDrawerOpen ? "close drawer" : "open drawer"}
             onClick={onMenuClick}
             edge="start"
             sx={{
-              mr: 2,
-              ...(isDrawerOpen && { display: "none" }),
+              mr: 2
             }}
           >
             <MenuIcon />
