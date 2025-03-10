@@ -128,12 +128,8 @@ export default function Layout({ children }: LayoutProps) {
   );
 
   // Toggle drawer open/close
-  const handleDrawerOpen = () => {
-    setIsDrawerOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setIsDrawerOpen(false);
+  const handleDrawerToggle = () => {
+    setIsDrawerOpen(!isDrawerOpen);
   };
 
   // Toggle theme between light and dark
@@ -148,14 +144,14 @@ export default function Layout({ children }: LayoutProps) {
 
         {/* App Bar */}
         <AppBar
-          onMenuClick={handleDrawerOpen}
+          onMenuClick={handleDrawerToggle}
           onThemeToggle={toggleTheme}
           isDarkMode={mode === "dark"}
           isDrawerOpen={isDrawerOpen}
         />
 
         {/* Navigation Drawer */}
-        <SidebarNav open={isDrawerOpen} onClose={handleDrawerClose} />
+        <SidebarNav open={isDrawerOpen} onClose={handleDrawerToggle} />
 
         {/* Main Content */}
         <Box
